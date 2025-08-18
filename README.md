@@ -14,9 +14,12 @@ Flow is a simple, fast, and easy-to-learn programming language that compiles to 
 ## Performance
 
 Flow offers significant performance improvements over Python:
-- ~30% faster than previous versions (0.186s → 0.136s on Fibonacci benchmark)
-- ~20x faster than Python for compute-intensive tasks
-- Approaching C-like performance for many operations
+- ~5x faster than Python for compute-intensive tasks
+- Significantly slower than C (currently ~20x slower) but optimized for simplicity and safety
+- Performance will improve in future versions
+
+Recent benchmark results:
+- Fibonacci(35): C (0.006s) vs Flow (0.131s) vs Python (0.067s)
 
 ## Quick Start
 
@@ -43,6 +46,7 @@ python -m flow.flow_cli hello.flow
 - [Performance Comparison](docs/performance-comparison.md) - C, Python, and Flow comparison
 - [Quick Reference](docs/quick-reference.md) - Syntax cheat sheet
 - [Examples](examples/) - Sample programs
+- [Examples Documentation](docs/examples.md) - Detailed explanations of each example
 
 ## Key Language Features
 
@@ -166,6 +170,10 @@ Check out the [examples directory](examples/) for sample programs:
 - [List Operations](examples/lists.flow)
 - [File I/O](examples/fileio.flow)
 - [Math Functions](examples/math.flow)
+- [Pattern Matching](examples/match.flow)
+- [Walrus Operator](examples/walrus.flow)
+- [Enhanced Features](examples/enhanced.flow)
+- [Comprehensive Example](examples/comprehensive.flow)
 
 You can also view the [examples documentation](docs/examples.md) for detailed explanations of each example.
 

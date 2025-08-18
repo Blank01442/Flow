@@ -234,10 +234,12 @@ Flow is working on implementing error handling features. Currently, invalid oper
    ```
 
 2. Enable JIT caching for faster startup:
-   Flow automatically caches compiled functions
+   Flow automatically caches compiled functions for faster execution on subsequent runs
 
 3. Use built-in functions when possible:
    Built-in functions are optimized and faster than custom implementations
+
+4. Try the [Performance Comparison](performance-comparison.md) to see how Flow compares to other languages
 
 ## Next Steps
 

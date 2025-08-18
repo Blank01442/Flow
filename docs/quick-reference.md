@@ -11,11 +11,31 @@ print "Hello, World!"
 ## Variables
 
 ```flow
-let name = "Flow"        # String
-let age = 5              # Integer
+let name = "Flow"        # String (immutable)
+mut age = 5              # Integer (mutable)
 let pi = 3.14159         # Float
 let isFast = true        # Boolean
-let items = [1, 2, 3]    # List
+let items = [1, 2, 3]     # List
+let point = (10, 20)     # Tuple
+```
+
+## Functions
+
+```flow
+# Basic function
+func greet(name) {
+    return "Hello, " + name + "!"
+}
+
+# Function with multiple parameters
+func add(x, y) {
+    return x + y
+}
+
+# Generic-like function
+fn multiply[T](a: T, b: T) -> T {
+    return a * b
+}
 ```
 
 ## Control Flow
@@ -25,7 +45,7 @@ let items = [1, 2, 3]    # List
 ```flow
 if condition {
     # code
-} else if otherCondition {
+} else if other_condition {
     # code
 } else {
     # code
@@ -35,167 +55,204 @@ if condition {
 ### While Loops
 
 ```flow
-while condition {
-    # code
+mut i = 0
+while i < 10 {
+    print i
+    i = i + 1
 }
 ```
 
 ### For Loops
 
 ```flow
-for item in list {
-    # code
+# Range-based for loop
+for i in range(5) {
+    print i
 }
 
-# With range
-for i in range(5) {
-    # code
+# List iteration
+let fruits = ["apple", "banana", "cherry"]
+for fruit in fruits {
+    print fruit
 }
 ```
 
-### Match Statements (Pattern Matching)
+## Pattern Matching
 
 ```flow
 match value {
-    case pattern1:
-        # code
-    case pattern2:
-        # code
+    case 0:
+        print "Zero"
+    case 1:
+        print "One"
+    case 2:
+        print "Two"
     default:
-        # code
+        print "Other"
+}
+
+# Tuple pattern matching
+match point {
+    case (0, 0):
+        print "Origin"
+    case (x, 0):
+        print "On X-axis:", x
+    case (0, y):
+        print "On Y-axis:", y
+    case (x, y):
+        print "Point:", x, y
 }
 ```
 
-## Functions
+## Data Structures
+
+### Lists
 
 ```flow
-func functionName(param1, param2) {
-    # code
-    return value
-}
-
-# Call function
-let result = functionName(arg1, arg2)
+let numbers = [1, 2, 3, 4, 5]
+append(numbers, 6)     # Add element
+let first = numbers[0] # Access element
+numbers[0] = 10        # Modify element
+let count = len(numbers) # Get length
 ```
 
-## Lists
+### Tuples
 
 ```flow
-let list = [1, 2, 3]     # Create list
-let item = list[0]       # Access item
-list[0] = 5              # Modify item
-append(list, 4)          # Add item
-let length = len(list)   # Get length
+let point = (10, 20, 30)
+let x = point[0]
+let (a, b, c) = point  # Destructuring
 ```
 
-## Built-in Functions
+### Dictionaries
 
-### String Functions
-- `len(string)` - Get string length
-- `split(string, delimiter)` - Split string into list
-- `substr(string, start, length)` - Extract substring
-- `ord(char)` - Get ASCII value of character
-- `chr(number)` - Get character from ASCII value
-- `hex(number)` - Convert to hexadecimal string
-- `bin(number)` - Convert to binary string
-
-### Math Functions
-- `abs(number)` - Absolute value
-- `pow(base, exponent)` - Power function
-- `sqrt(number)` - Square root
-- `sin(number)` - Sine
-- `cos(number)` - Cosine
-- `tan(number)` - Tangent
-- `log(number)` - Natural logarithm
-- `floor(number)` - Round down
-- `ceil(number)` - Round up
-- `round(number, decimals)` - Round to specified decimals
-
-### List Functions
-- `len(list)` - Get list length
-- `append(list, item)` - Add item to list
-- `sum(list)` - Sum of numbers in list
-- `max(list)` - Maximum value in list
-- `min(list)` - Minimum value in list
-- `range(count)` - Create list [0, 1, ..., count-1]
-- `sort(list)` - Sort list in place
-- `reverse(list)` - Reverse list in place
-- `contains(list, item)` - Check if item is in list
-
-### File I/O Functions
-- `read_file(filename)` - Read file contents
-- `write_file(filename, content)` - Write content to file
-
-### Random Functions
-- `random()` - Generate random float 0.0-1.0
-- `randint(min, max)` - Generate random integer
-- `shuffle(list)` - Shuffle list in place
-
-### Type and Conversion Functions
-- `type(value)` - Get type of value
-- `str(value)` - Convert to string
-- `int(value)` - Convert to integer
-- `float(value)` - Convert to float
-
-### Input/Output Functions
-- `input(prompt)` - Get user input
-- `exit(code)` - Exit program
-
-### System Functions
-- `time()` - Get current timestamp
-- `os_system(command)` - Execute system command
+```flow
+let person = {"name": "Alice", "age": 30}
+person["city"] = "New York"
+let name = person["name"]
+```
 
 ## Operators
 
 ### Arithmetic
-- `+` - Addition
-- `-` - Subtraction
-- `*` - Multiplication
-- `/` - Division
-- `%` - Modulo
-- `**` - Power
+```flow
++  # Addition
+-  # Subtraction
+*  # Multiplication
+/  # Division
+%  # Modulo
+** # Power
+```
 
 ### Comparison
-- `==` - Equal
-- `!=` - Not equal
-- `<` - Less than
-- `<=` - Less than or equal
-- `>` - Greater than
-- `>=` - Greater than or equal
+```flow
+==  # Equal
+!=  # Not equal
+<   # Less than
+<=  # Less than or equal
+>   # Greater than
+>=  # Greater than or equal
+```
 
 ### Logical
-- `and` - Logical AND
-- `or` - Logical OR
-- `not` - Logical NOT
+```flow
+and  # Logical AND
+or   # Logical OR
+not  # Logical NOT
+```
 
 ### Bitwise
-- `&` - Bitwise AND
-- `|` - Bitwise OR
-- `^` - Bitwise XOR
-
-### Assignment Expression (Walrus Operator)
-- `:=` - Assignment within expressions
-
-## Comments
-
 ```flow
-# This is a single-line comment
-
-# Multi-line comments are just multiple
-# single-line comments
+&  # Bitwise AND
+|  # Bitwise OR
+^  # Bitwise XOR
+~  # Bitwise NOT
+<< # Left shift
+>> # Right shift
 ```
 
-## Program Structure
+## Built-in Functions
 
+### Mathematical
 ```flow
-# Global variables
-let globalVar = "value"
+let root = sqrt(16)      # Square root
+let power = pow(2, 3)    # Power
+let absolute = abs(-5)   # Absolute value
+let minimum = min(1, 2)  # Minimum
+let maximum = max(1, 2)  # Maximum
+let rounded = round(3.14) # Round
+```
 
-# Functions
-func myFunction() {
-    # function body
+### String and List
+```flow
+let length = len("text")     # Length
+let parts = split("a,b,c", ",") # Split string
+let joined = join("-", ["a", "b", "c"]) # Join list
+let range_list = range(5)    # Generate range
+```
+
+### I/O
+```flow
+let input_text = input("Enter text: ")  # Read input
+let file_content = read_file("data.txt") # Read file
+write_file("output.txt", "Hello")       # Write file
+```
+
+### Utility
+```flow
+let current_time = time()        # Current timestamp
+sleep(1.5)                       # Sleep for 1.5 seconds
+let random_float = random()      # Random float 0.0-1.0
+let random_int = randint(1, 10)  # Random integer 1-10
+```
+
+## Memory Safety Features
+
+### Immutable by Default
+```flow
+let immutable_value = 42  # Cannot be changed
+mut mutable_value = 42     # Can be changed
+```
+
+### Bounds Checking
+```flow
+let arr = [1, 2, 3]
+let safe_access = arr[5]  # Runtime bounds check
+```
+
+## Advanced Syntax
+
+### Walrus Operator
+```flow
+if (x := calculate_value()) > 10 {
+    print "Large value:", x
 }
-
-# Main code
-print "Program starts here"
 ```
+
+### Match Expressions
+```flow
+let result = match value {
+    case 0: "zero"
+    case 1: "one"
+    default: "other"
+}
+```
+
+## Command Line Usage
+
+```bash
+# Run a Flow program
+python -m flow.flow_cli program.flow
+
+# Run with profiling
+python -m flow.flow_cli program.flow --profile
+
+# Start REPL
+python -m flow.flow_cli
+```
+
+## Performance Optimizations
+
+- **JIT Caching**: Functions are cached for faster execution on subsequent runs
+- **Profiling**: Built-in profiler for performance analysis
+- **LLVM Backend**: Optional LLVM compilation for maximum speed (experimental)

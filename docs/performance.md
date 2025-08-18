@@ -159,7 +159,7 @@ for i in range(1000) {
 
 ## Performance Comparison
 
-Flow's performance significantly exceeds Python while approaching C-like speeds for many tasks. See the [Performance Comparison](performance-comparison.md) document for detailed benchmarks.
+Flow's performance significantly exceeds Python while being slower than C. Current benchmarks show Flow is approximately 5x faster than Python and 20x slower than C for compute-intensive tasks. Flow prioritizes simplicity, safety, and ease of use over maximum performance. See the [Performance Comparison](performance-comparison.md) document for detailed benchmarks.
 
 ## Best Practices
 

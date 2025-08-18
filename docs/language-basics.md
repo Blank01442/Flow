@@ -21,216 +21,242 @@ let message = greet(name)
 print message
 ```
 
-## Variables
+## Variables and Types
 
-In Flow, variables are declared using the `let` keyword:
+### Variable Declaration
+
+Variables are declared using the `let` keyword for immutable variables:
 
 ```flow
 let name = "Flow"
 let age = 5
 let pi = 3.14159
-let isFast = true
 ```
 
-Variables in Flow are dynamically typed, meaning you don't need to declare their type explicitly. The type is inferred from the value assigned to the variable.
+For mutable variables, use the `mut` keyword:
 
-### Data Types
-
-Flow supports several built-in data types:
-
-1. **Numbers**: Both integers and floating-point numbers
-   ```flow
-   let integer = 42
-   let float = 3.14159
-   ```
-
-2. **Strings**: Text enclosed in double quotes
-   ```flow
-   let greeting = "Hello, World!"
-   ```
-
-3. **Booleans**: Logical values `true` or `false`
-   ```flow
-   let isActive = true
-   let isComplete = false
-   ```
-
-4. **Lists**: Ordered collections of values
-   ```flow
-   let numbers = [1, 2, 3, 4, 5]
-   let mixed = ["text", 42, true]
-   ```
-
-### Operators
-
-Flow supports common operators for mathematical and logical operations:
-
-#### Arithmetic Operators
-- `+` : Addition
-- `-` : Subtraction
-- `*` : Multiplication
-- `/` : Division
-- `%` : Modulo (remainder)
-- `**` : Exponentiation
-
-#### Comparison Operators
-- `==` : Equal to
-- `!=` : Not equal to
-- `<` : Less than
-- `<=` : Less than or equal to
-- `>` : Greater than
-- `>=` : Greater than or equal to
-
-#### Logical Operators
-- `and` : Logical AND
-- `or` : Logical OR
-- `not` : Logical NOT
-
-### Bitwise Operators
-- `&` : Bitwise AND
-- `|` : Bitwise OR
-- `^` : Bitwise XOR
-
-### Assignment Expression Operator (Walrus Operator)
-- `:=` : Assignment within expressions
-
-### Examples
 ```flow
-let sum = 5 + 3        # 8
-let isEqual = 5 == 3   # false
-let isTrue = true and false  # false
-
-# Bitwise operations
-let a = 5  # Binary: 101
-let b = 3  # Binary: 011
-let andResult = a & b  # 1 (Binary: 001)
-let orResult = a | b   # 7 (Binary: 111)
-let xorResult = a ^ b  # 6 (Binary: 110)
-
-# Walrus operator
-if (x := 5) > 3 {
-    print "x is", x, "which is greater than 3"
-}
+mut counter = 0
+counter = counter + 1
 ```
 
-## Control Flow
+### Tuples
 
-Flow provides standard control flow structures:
+Flow supports tuples for grouping multiple values together:
 
-### If Statements
 ```flow
-if condition {
-    # code executed if condition is true
-} else if otherCondition {
-    # code executed if otherCondition is true
-} else {
-    # code executed if neither condition is true
-}
+# Creating a tuple
+let point = (10, 20, 30)
+print "Point:", point
+
+# Accessing tuple elements
+let x = point[0]
+let y = point[1]
+let z = point[2]
+print "X:", x, "Y:", y, "Z:", z
+
+# Tuple destructuring
+let (a, b, c) = point
+print "Destructured:", a, b, c
 ```
 
-### While Loops
-```flow
-while condition {
-    # code executed repeatedly while condition is true
-}
-```
+### Pattern Matching
 
-### For Loops
-```flow
-for item in list {
-    # code executed for each item in the list
-}
+Flow has powerful pattern matching capabilities using the `match` statement:
 
-# With range
-for i in range(5) {
-    # code executed 5 times with i = 0, 1, 2, 3, 4
-}
-```
-
-### Match Statements (Pattern Matching)
 ```flow
+let value = 2
 match value {
+    case 0:
+        print "Zero"
     case 1:
-        # code executed if value equals 1
+        print "One"
     case 2:
-        # code executed if value equals 2
+        print "Two"
     default:
-        # code executed if no case matches
+        print "Other"
 }
 ```
 
 ## Functions
 
-Functions in Flow are defined using the `func` keyword:
+Functions are declared using the `func` keyword:
 
 ```flow
-func functionName(parameter1, parameter2) {
-    # function body
-    return value
+func add(x, y) {
+    return x + y
+}
+
+let result = add(5, 3)
+print "Result:", result
+```
+
+### Generic-like Functions
+
+Flow supports generic-like function syntax:
+
+```flow
+fn add[T](a: T, b: T) -> T {
+    return a + b
+}
+
+let int_result = add[int](5, 3)
+let float_result = add[float](3.14, 2.86)
+```
+
+## Control Flow
+
+### If Statements
+
+```flow
+let temperature = 25
+
+if temperature > 30 {
+    print "It's hot!"
+} else if temperature < 10 {
+    print "It's cold!"
+} else {
+    print "It's pleasant."
 }
 ```
 
-Functions can return values using the `return` statement. If no return statement is executed, the function returns `null`.
+### While Loops
 
-### Function Calls
 ```flow
-let result = functionName(arg1, arg2)
+mut i = 0
+while i < 5 {
+    print "Iteration:", i
+    i = i + 1
+}
 ```
 
-## Lists
+### For Loops
 
-Lists are ordered collections that can hold any type of value:
+```flow
+# Range-based for loops
+for i in range(5) {
+    print "Index:", i
+}
+
+# For loops with lists
+let fruits = ["apple", "banana", "cherry"]
+for fruit in fruits {
+    print "Fruit:", fruit
+}
+```
+
+## Data Structures
+
+### Lists
 
 ```flow
 # Creating lists
-let emptyList = []
 let numbers = [1, 2, 3, 4, 5]
-let mixed = ["text", 42, true]
+let empty_list = []
 
-# Accessing elements
-let first = numbers[0]  # 1 (0-based indexing)
+# List operations
+append(numbers, 6)
+let first = numbers[0]
+numbers[0] = 10
+```
 
-# Modifying elements
-numbers[0] = 10  # numbers is now [10, 2, 3, 4, 5]
+### Dictionaries/Maps
+
+```flow
+# Creating dictionaries
+let person = {"name": "Alice", "age": 30}
+let empty_dict = {}
+
+# Dictionary operations
+person["city"] = "New York"
+let name = person["name"]
+```
+
+## Memory Safety
+
+Flow provides several memory safety features:
+
+### Bounds Checking
+
+```flow
+let arr = [1, 2, 3]
+# This will safely check bounds at runtime
+let value = arr[5]  # Will raise an error instead of crashing
+```
+
+### Immutable by Default
+
+```flow
+let immutable_value = 42
+# immutable_value = 43  # This would be a compile error
+
+mut mutable_value = 42
+mutable_value = 43  # This is allowed
+```
+
+## Error Handling
+
+Flow provides safe error handling mechanisms:
+
+```flow
+# Pattern matching for error handling
+match result {
+    case Ok(value):
+        print "Success:", value
+    case Err(error):
+        print "Error:", error
+}
+```
+
+## Advanced Features
+
+### Walrus Operator
+
+The walrus operator `:=` allows assignment within expressions:
+
+```flow
+if (x := calculate_value()) > 10 {
+    print "Value is large:", x
+}
+```
+
+### Bitwise Operations
+
+```flow
+let a = 5  # Binary: 101
+let b = 3  # Binary: 011
+let and_result = a & b  # 1 (Binary: 001)
+let or_result = a | b   # 7 (Binary: 111)
+let xor_result = a ^ b  # 6 (Binary: 110)
+```
+
+## Built-in Functions
+
+Flow includes a rich standard library with built-in functions:
+
+```flow
+# Mathematical functions
+let root = sqrt(16)
+let power = pow(2, 3)
+let absolute = abs(-5)
+
+# String functions
+let length = len("Hello")
+let parts = split("a,b,c", ",")
 
 # List functions
-append(numbers, 6)  # Add element to end
-let length = len(numbers)  # Get list length
+let numbers = range(10)
+let sum_result = sum(numbers)
 ```
 
-## Comments
+## Performance Features
 
-Comments in Flow start with the `#` character and continue to the end of the line:
+### Profiling
 
-```flow
-# This is a single-line comment
-
-let x = 5  # This is also a comment
-
-# Multi-line comments are just multiple
-# single-line comments
+```bash
+python -m flow.flow_cli program.flow --profile
 ```
 
-## Program Structure
+### JIT Caching
 
-```flow
-# Global variables
-let globalVar = "value"
-
-# Functions
-func myFunction() {
-    # function body
-}
-
-# Main code
-print "Program starts here"
-```
-
-## Next Steps
-
-After understanding these basics, you should explore:
-
-1. [Control Flow](control-flow.md) for more detailed information on if statements and loops
-2. [Functions](functions.md) for advanced function concepts
-3. [Built-in Functions](built-in-functions.md) for the complete list of available functions
-4. [Examples](examples.md) to see these concepts in practice
+Flow automatically caches compiled functions for faster startup on subsequent executions.
