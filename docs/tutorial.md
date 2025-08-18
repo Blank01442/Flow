@@ -224,15 +224,7 @@ print "Number of lines:", lineCount
 
 ## Error Handling
 
-Flow uses try/catch blocks for error handling:
-
-```flow
-try {
-    let result = 10 / 0
-} catch error {
-    print "Error occurred:", error
-}
-```
+Flow is working on implementing error handling features. Currently, invalid operations will cause the program to terminate with an error message.
 
 ## Performance Tips
 

@@ -188,37 +188,41 @@ Here are some practical examples of working with data structures:
 ### Student Grades
 
 ```flow
+# This example would use dictionaries/objects if they were implemented
+# For now, you might represent structured data using lists with known indices:
+# [name, grade1, grade2, grade3]
 let students = [
-    {"name": "Alice", "grades": [85, 92, 78]},
-    {"name": "Bob", "grades": [90, 88, 95]},
-    {"name": "Charlie", "grades": [70, 82, 75]}
+    ["Alice", 85, 92, 78],
+    ["Bob", 90, 88, 95],
+    ["Charlie", 70, 82, 75]
 ]
 
 # Calculate average grade for each student
 for student in students {
-    let sum = 0
-    for grade in student["grades"] {
-        sum = sum + grade
-    }
-    let average = sum / len(student["grades"])
-    print student["name"], "average:", average
+    let name = student[0]
+    let sum = student[1] + student[2] + student[3]
+    let average = sum / 3
+    print name, "average:", average
 }
 ```
 
 ### Shopping Cart
 
 ```flow
+# This example would use dictionaries/objects if they were implemented
+# For now, you might represent structured data using lists with known indices:
+# [item_name, price, quantity]
 let cart = [
-    {"item": "apple", "price": 0.5, "quantity": 3},
-    {"item": "banana", "price": 0.3, "quantity": 5},
-    {"item": "orange", "price": 0.7, "quantity": 2}
+    ["apple", 0.5, 3],
+    ["banana", 0.3, 5],
+    ["orange", 0.7, 2]
 ]
 
 let total = 0
 for item in cart {
-    let itemTotal = item["price"] * item["quantity"]
+    let itemTotal = item[1] * item[2]  # price * quantity
     total = total + itemTotal
-    print item["quantity"], item["item"], "at $", item["price"], "each = $", itemTotal
+    print item[2], item[0], "at $", item[1], "each = $", itemTotal
 }
 
 print "Total: $", total

@@ -170,8 +170,23 @@ Comments in Flow start with the `#` character and continue to the end of the lin
 
 let x = 5  # This is also a comment
 
-# Multi-line comments are created by using multiple
-# single-line comments like this one
+# Multi-line comments are just multiple
+# single-line comments
+```
+
+## Program Structure
+
+```flow
+# Global variables
+let globalVar = "value"
+
+# Functions
+func myFunction() {
+    # function body
+}
+
+# Main code
+print "Program starts here"
 ```
 
 ## Next Steps

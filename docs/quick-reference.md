@@ -136,13 +136,7 @@ let length = len(list)   # Get length
 
 ## Error Handling
 
-```flow
-try {
-    # code that might fail
-} catch error {
-    # handle error
-}
-```
+Flow is working on implementing error handling features. Currently, invalid operations will cause the program to terminate with an error message.
 
 ## Comments
 

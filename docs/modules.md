@@ -1,6 +1,6 @@
-# Modules and Imports
+# Modules
 
-Modules in Flow allow you to organize your code into separate files and reuse functionality across different programs. This document explains how to create and use modules in Flow.
+Flow is working on implementing a module system to allow you to organize your code into separate files and reuse functionality across different programs. This document explains the planned approach for modules in Flow.
 
 ## What are Modules?
 
@@ -110,61 +110,6 @@ func isOdd(n) {
 
 Then reference these functions in your main programs.
 
-## Module Best Practices
-
-### 1. Naming Conventions
-
-- Use descriptive names for module files
-- Use lowercase with underscores for multi-word names (e.g., `string_utils.flow`)
-- Be consistent with naming across your project
-
-### 2. Documentation
-
-Document your modules with comments explaining:
-
-```flow
-# String Utilities Module
-# Provides common string manipulation functions
-# Author: Your Name
-# Version: 1.0
-
-func reverseString(str) {
-    # Reverses the characters in a string
-    # Parameters:
-    #   str - the string to reverse
-    # Returns:
-    #   the reversed string
-    let reversed = ""
-    let i = len(str) - 1
-    while i >= 0 {
-        reversed = reversed + str[i]
-        i = i - 1
-    }
-    return reversed
-}
-```
-
-### 3. Function Organization
-
-- Group related functions together
-- Place commonly used functions at the top
-- Use consistent parameter ordering
-- Handle edge cases appropriately
-
-### 4. Constants
-
-Define constants at the module level:
-
-```flow
-# Mathematical constants
-let PI = 3.14159
-let E = 2.71828
-
-# Configuration values
-let MAX_RETRIES = 3
-let TIMEOUT = 30
-```
-
 ## Example: Creating a File Utilities Module
 
 **file_utils.flow**:
@@ -228,11 +173,4 @@ This will make code organization and reuse much more powerful and convenient.
 3. **Clear Dependencies**: Minimize dependencies between modules
 4. **Error Handling**: Handle errors gracefully and provide meaningful error messages
 5. **Testing**: Include test cases for module functions
-
-## Next Steps
-
-After learning about modules, explore:
-
-1. [Examples](examples.md) to see how to organize code in practice
-2. [Best Practices](best-practices.md) for overall coding guidelines
-3. [Built-in Functions](built-in-functions.md) to learn about the standard library
+```

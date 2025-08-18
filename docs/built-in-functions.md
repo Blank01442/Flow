@@ -56,13 +56,3 @@ write_file("output.txt", "Hello, File!")
 # Execute system commands
 os_system("echo Hello from system")
 ```
-
-## JSON Functions
-
-```flow
-# Parse JSON
-let data = json_parse("{\"name\": \"Flow\", \"version\": 1.0}")
-
-# Convert to JSON
-let jsonString = json_stringify({"name": "Flow", "version": 1.0})
-```
