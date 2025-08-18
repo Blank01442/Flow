@@ -1,2 +1,0 @@
-write_file("test.txt", "Hello from Flow!")
-print read_file("test.txt")

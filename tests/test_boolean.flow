@@ -1,4 +1,0 @@
-let isTrue = true
-let isFalse = false
-print "True:", isTrue
-print "False:", isFalse

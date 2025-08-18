@@ -1,4 +1,0 @@
-# Simple test with built-in function
-
-let x = len("Hello")
-print "Length:", x

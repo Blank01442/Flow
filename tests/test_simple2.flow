@@ -1,4 +1,0 @@
-# Very simple test
-
-let x = 5
-print "Value:", x

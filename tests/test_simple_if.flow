@@ -1,4 +1,0 @@
-let average = 85
-if average >= 80 {
-    print "Good"
-}

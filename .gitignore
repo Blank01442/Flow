@@ -148,3 +148,6 @@ examples/single-match.flow
 examples/simple-match.flow
 examples/simple-walrus*.flow
 examples/and-test.flow
+
+# Tests folder
+tests/
