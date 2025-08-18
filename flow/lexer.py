@@ -13,16 +13,20 @@ class TokenType(Enum):
     FUNC = r'func'
     RETURN = r'return'
     EXTERN = r'extern'
+    MATCH = r'match'
+    CASE = r'case'
+    DEFAULT = r'default'
 
     # Data types
     IDENTIFIER = r'[a-zA-Z_][a-zA-Z0-9_]*'
     FLOAT = r'\d+\.\d+'
     INTEGER = r'\d+'
-    STRING = r'"(?:\\.|[^\\"])*"'
+    STRING = r'"(?:\.|[^"])*"'
     BOOLEAN = r'true|false'
 
     # Operators
     EQUALS = r'='
+    WALRUS = r':='
     PLUS = r'\+'
     MINUS = r'-'
     MULTIPLY = r'\*'
@@ -34,6 +38,7 @@ class TokenType(Enum):
     RBRACKET = r'\]'
     LBRACE = r'\{'
     RBRACE = r'\}'
+    COLON = r':'
     COMMA = r','
     LESS_THAN = r'<'
     GREATER_THAN = r'>'
@@ -89,6 +94,9 @@ class Lexer:
             (TokenType.FUNC, re.compile(r'func')),
             (TokenType.RETURN, re.compile(r'return')),
             (TokenType.EXTERN, re.compile(r'extern')),
+            (TokenType.MATCH, re.compile(r'match')),
+            (TokenType.CASE, re.compile(r'case')),
+            (TokenType.DEFAULT, re.compile(r'default')),
             (TokenType.BOOLEAN, re.compile(r'true|false')),
             (TokenType.FLOAT, re.compile(r'\d+\.\d+')),
             (TokenType.INTEGER, re.compile(r'\d+')),
@@ -113,9 +121,12 @@ class Lexer:
             (TokenType.RBRACKET, re.compile(r'\]')),
             (TokenType.LBRACE, re.compile(r'\{')),
             (TokenType.RBRACE, re.compile(r'\}')),
+            (TokenType.WALRUS, re.compile(r':=')),
+            (TokenType.COLON, re.compile(r':')),
             (TokenType.COMMA, re.compile(r',')),
             (TokenType.LESS_THAN, re.compile(r'<')),
             (TokenType.GREATER_THAN, re.compile(r'>')),
+            (TokenType.WALRUS, re.compile(r':=')),
             (TokenType.IDENTIFIER, re.compile(r'[a-zA-Z_][a-zA-Z0-9_]*')),
             (TokenType.NEWLINE, re.compile(r'\n')),
             (TokenType.WHITESPACE, re.compile(r'[ \t]+')),

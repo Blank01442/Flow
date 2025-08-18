@@ -1,0 +1,28 @@
+# Walrus Operator Example
+print "Walrus Operator Demo"
+
+# Simple assignment expression
+if (x := 5) > 3 {
+    print "x is", x, "which is greater than 3"
+}
+
+# Using walrus operator in a while loop
+let data = [1, 2, 3, 4, 5]
+let i = 0
+while (value := data[i]) < 4 {
+    print "Value is", value
+    i = i + 1
+}
+
+# Walrus operator with built-in functions
+let text = "Hello, Flow!"
+if (length := len(text)) > 10 {
+    print "Text has", length, "characters, which is more than 10"
+}
+
+# Multiple assignment expressions
+let a = 10
+let b = 20
+if (sum := a + b) > 25 and (diff := a - b) < 5 {
+    print "Sum is", sum, "and difference is", diff
+}

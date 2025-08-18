@@ -8,7 +8,7 @@ from functools import lru_cache
 from .parser import (
     ProgramNode, PrintNode, StringNode, IntegerNode, FloatNode, BooleanNode, BinOpNode,
     VariableDeclarationNode, VariableAccessNode, AssignmentNode, IfNode,
-    WhileNode, ForNode, FunctionDeclarationNode, FunctionCallNode, ReturnNode,
+    WhileNode, ForNode, MatchNode, CaseNode, AssignmentExpressionNode, FunctionDeclarationNode, FunctionCallNode, ReturnNode,
     BlockNode, ExternFunctionDeclarationNode, BuiltinFunctionCallNode,
     ListNode, IndexAccessNode, IndexAssignmentNode, UnaryOpNode
 )
@@ -242,6 +242,35 @@ class VM:
                     del self.globals[node.target]
         else:
             raise Exception(f"Cannot iterate over {type(iterable).__name__}")
+
+    def visit_MatchNode(self, node):
+        """Handle match statements"""
+        # Evaluate the expression to match against
+        expression_value = self.visit(node.expression)
+        
+        # Try to match against each case
+        for case in node.cases:
+            # For simplicity, we'll do exact value matching
+            # In a more sophisticated implementation, we'd support pattern matching
+            pattern_value = self.visit(case.pattern)
+            
+            if expression_value == pattern_value:
+                # Execute the matching case block
+                self.visit(case.block)
+                return
+                
+        # If no case matched and there's a default case, execute it
+        if node.default_case:
+            self.visit(node.default_case)
+
+    def visit_AssignmentExpressionNode(self, node):
+        """Handle assignment expressions (walrus operator)"""
+        # Evaluate the value
+        value = self.visit(node.value)
+        # Store it in the globals
+        self.globals[node.identifier] = value
+        # Return the value (assignment expressions evaluate to the assigned value)
+        return value
 
     def visit_FunctionDeclarationNode(self, node):
         # Store the function definition in globals

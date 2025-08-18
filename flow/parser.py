@@ -68,6 +68,22 @@ class ForNode(ASTNode):
         self.iterable = iterable
         self.block = block
 
+class MatchNode(ASTNode):
+    def __init__(self, expression, cases, default_case=None):
+        self.expression = expression
+        self.cases = cases
+        self.default_case = default_case
+
+class CaseNode(ASTNode):
+    def __init__(self, pattern, block):
+        self.pattern = pattern
+        self.block = block
+
+class AssignmentExpressionNode(ASTNode):
+    def __init__(self, identifier, value):
+        self.identifier = identifier
+        self.value = value
+
 class FunctionDeclarationNode(ASTNode):
     def __init__(self, name, params, body):
         self.name = name
@@ -162,6 +178,8 @@ class Parser:
             return self.parse_while_statement()
         elif self.current_token.type == TokenType.FOR:
             return self.parse_for_statement()
+        elif self.current_token.type == TokenType.MATCH:
+            return self.parse_match_statement()
         elif self.current_token.type == TokenType.RETURN:
             self.advance()
             value = self.parse_expression()
@@ -267,6 +285,72 @@ class Parser:
         # Create a for loop node
         return ForNode(target, iterable, block)
 
+    def parse_match_statement(self):
+        """Parse match statements like 'match value { case pattern: ... default: ... }'"""
+        self.advance() # Consume 'match'
+        
+        # Parse the expression to match against
+        expression = self.parse_expression()
+        
+        # Parse the opening brace
+        if self.current_token.type != TokenType.LBRACE:
+            raise Exception("Expected '{' after match expression")
+        self.advance()
+        
+        # Parse cases
+        cases = []
+        default_case = None
+        
+        while self.current_token and self.current_token.type != TokenType.RBRACE:
+            if self.current_token.type == TokenType.CASE:
+                self.advance() # Consume 'case'
+                
+                # Parse the pattern
+                pattern = self.parse_expression()
+                
+                # Parse the colon
+                if self.current_token.type != TokenType.COLON:
+                    raise Exception("Expected ':' after case pattern")
+                self.advance()
+                
+                # Parse statements until we hit another case, default, or closing brace
+                statements = []
+                while (self.current_token and 
+                       self.current_token.type != TokenType.CASE and
+                       self.current_token.type != TokenType.DEFAULT and
+                       self.current_token.type != TokenType.RBRACE):
+                    statements.append(self.parse_statement())
+                
+                cases.append(CaseNode(pattern, BlockNode(statements)))
+                
+            elif self.current_token.type == TokenType.DEFAULT:
+                self.advance() # Consume 'default'
+                
+                # Parse the colon
+                if self.current_token.type != TokenType.COLON:
+                    raise Exception("Expected ':' after default")
+                self.advance()
+                
+                # Parse statements until we hit the closing brace
+                statements = []
+                while (self.current_token and 
+                       self.current_token.type != TokenType.CASE and
+                       self.current_token.type != TokenType.DEFAULT and
+                       self.current_token.type != TokenType.RBRACE):
+                    statements.append(self.parse_statement())
+                
+                default_case = BlockNode(statements)
+                
+            else:
+                raise Exception(f"Unexpected token in match statement: {self.current_token}")
+        
+        # Consume the closing brace
+        if self.current_token.type != TokenType.RBRACE:
+            raise Exception("Expected '}' to close match statement")
+        self.advance()
+        
+        return MatchNode(expression, cases, default_case)
+
     def parse_block(self):
         self.advance() # Consume '{'
         statements = []
@@ -276,8 +360,41 @@ class Parser:
         return BlockNode(statements)
 
     def parse_expression(self):
+        # Check for assignment expression (walrus operator)
+        # Look ahead to see if we have an identifier followed by :=
+        if (self.current_token and self.current_token.type == TokenType.IDENTIFIER and
+            self.pos + 1 < len(self.tokens) and 
+            self.tokens[self.pos + 1].type == TokenType.WALRUS):
+            # This is an assignment expression
+            identifier = self.current_token.value
+            self.advance()  # Consume identifier
+            self.advance()  # Consume :=
+            value = self.parse_expression()
+            return AssignmentExpressionNode(identifier, value)
+        
+        # Parse logical OR expressions (lowest precedence)
+        node = self.parse_logical_and()
+        while self.current_token and self.current_token.type == TokenType.OR:
+            op = self.current_token.type
+            self.advance()
+            right = self.parse_logical_and()
+            node = BinOpNode(node, op, right)
+        return node
+
+    def parse_logical_and(self):
+        # Parse logical AND expressions
+        node = self.parse_comparison()
+        while self.current_token and self.current_token.type == TokenType.AND:
+            op = self.current_token.type
+            self.advance()
+            right = self.parse_comparison()
+            node = BinOpNode(node, op, right)
+        return node
+
+    def parse_comparison(self):
+        # Parse comparison expressions
         node = self.parse_term()
-        while self.current_token and self.current_token.type in (TokenType.PLUS, TokenType.MINUS, TokenType.LESS_THAN, TokenType.GREATER_THAN, TokenType.EQUAL_EQUAL, TokenType.NOT_EQUALS, TokenType.LESS_EQUAL, TokenType.GREATER_EQUAL):
+        while self.current_token and self.current_token.type in (TokenType.LESS_THAN, TokenType.GREATER_THAN, TokenType.EQUAL_EQUAL, TokenType.NOT_EQUALS, TokenType.LESS_EQUAL, TokenType.GREATER_EQUAL):
             op = self.current_token.type
             self.advance()
             right = self.parse_term()
@@ -286,7 +403,7 @@ class Parser:
 
     def parse_term(self):
         node = self.parse_factor()
-        while self.current_token and self.current_token.type in (TokenType.MULTIPLY, TokenType.DIVIDE):
+        while self.current_token and self.current_token.type in (TokenType.PLUS, TokenType.MINUS):
             op = self.current_token.type
             self.advance()
             right = self.parse_factor()
@@ -294,10 +411,25 @@ class Parser:
         return node
 
     def parse_factor(self):
+        node = self.parse_power()
+        while self.current_token and self.current_token.type in (TokenType.MULTIPLY, TokenType.DIVIDE):
+            op = self.current_token.type
+            self.advance()
+            right = self.parse_power()
+            node = BinOpNode(node, op, right)
+        return node
+
+    def parse_power(self):
+        # Handle exponentiation (highest precedence)
+        node = self.parse_unary()
+        # Note: We're not implementing power operator in this version
+        return node
+
+    def parse_unary(self):
         token = self.current_token
         if token.type == TokenType.MINUS:  # Handle unary minus
             self.advance()
-            factor = self.parse_factor()
+            factor = self.parse_unary()
             return UnaryOpNode(TokenType.MINUS, factor)
         elif token.type == TokenType.INTEGER:
             self.advance()
@@ -327,9 +459,24 @@ class Parser:
             return self.parse_list_literal()
         elif token.type == TokenType.LPAREN:
             self.advance()
-            node = self.parse_expression()
-            self.advance() # Consume RPAREN
-            return node
+            # Check if this is an assignment expression
+            # Look ahead to see if we have an identifier followed by :=
+            if (self.current_token and self.current_token.type == TokenType.IDENTIFIER and
+                self.pos + 1 < len(self.tokens) and 
+                self.tokens[self.pos + 1].type == TokenType.WALRUS):
+                # This is an assignment expression within parentheses
+                node = self.parse_expression()
+                if self.current_token.type != TokenType.RPAREN:
+                    raise Exception("Expected ')' after assignment expression")
+                self.advance() # Consume RPAREN
+                return node
+            else:
+                # Normal parenthesized expression
+                node = self.parse_expression()
+                if self.current_token.type != TokenType.RPAREN:
+                    raise Exception("Expected ')' after expression")
+                self.advance() # Consume RPAREN
+                return node
         raise Exception(f"Invalid syntax at token {token}")
 
     def parse_list_literal(self):

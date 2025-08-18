@@ -1,0 +1,4 @@
+# Simple walrus test
+if (x := 5) > 3 {
+    print "x is", x
+}
