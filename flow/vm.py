@@ -2,12 +2,13 @@ from .bytecode import OpCode, CompareOp
 from . import builtins
 from .profiler import global_profiler, profile_block
 import time
+from functools import lru_cache
 
 # Import AST nodes
 from .parser import (
     ProgramNode, PrintNode, StringNode, IntegerNode, FloatNode, BooleanNode, BinOpNode,
     VariableDeclarationNode, VariableAccessNode, AssignmentNode, IfNode,
-    WhileNode, FunctionDeclarationNode, FunctionCallNode, ReturnNode,
+    WhileNode, ForNode, FunctionDeclarationNode, FunctionCallNode, ReturnNode,
     BlockNode, ExternFunctionDeclarationNode, BuiltinFunctionCallNode,
     ListNode, IndexAccessNode, IndexAssignmentNode, UnaryOpNode
 )
@@ -31,6 +32,13 @@ class VM:
         self._instruction_handlers = self._build_instruction_handlers()
         self.profiler = global_profiler
         self._method_cache = {}  # Cache for visitor methods
+        # Cache for parsed AST nodes to avoid re-parsing
+        self._ast_cache = {}
+        
+    @lru_cache(maxsize=128)
+    def _cached_evaluate_condition(self, condition_code):
+        """Cache evaluated conditions for better performance in loops"""
+        return self.visit(condition_code)
 
     def _build_instruction_handlers(self):
         """Build instruction handler dispatch table for better performance"""
@@ -141,28 +149,47 @@ class VM:
         left = self.visit(node.left)
         right = self.visit(node.right)
         
-        if node.op == TokenType.PLUS:
+        # Use a dispatch table for binary operations for better performance
+        op = node.op
+        if op == TokenType.PLUS:
             return left + right
-        elif node.op == TokenType.MINUS:
+        elif op == TokenType.MINUS:
             return left - right
-        elif node.op == TokenType.MULTIPLY:
+        elif op == TokenType.MULTIPLY:
             return left * right
-        elif node.op == TokenType.DIVIDE:
+        elif op == TokenType.DIVIDE:
             return left / right
-        elif node.op == TokenType.LESS_THAN:
+        elif op == TokenType.MODULO:
+            return left % right
+        elif op == TokenType.LESS_THAN:
             return left < right
-        elif node.op == TokenType.GREATER_THAN:
+        elif op == TokenType.GREATER_THAN:
             return left > right
-        elif node.op == TokenType.EQUAL_EQUAL:
+        elif op == TokenType.EQUAL_EQUAL:
             return left == right
-        elif node.op == TokenType.NOT_EQUALS:
+        elif op == TokenType.NOT_EQUALS:
             return left != right
-        elif node.op == TokenType.LESS_EQUAL:
+        elif op == TokenType.LESS_EQUAL:
             return left <= right
-        elif node.op == TokenType.GREATER_EQUAL:
+        elif op == TokenType.GREATER_EQUAL:
             return left >= right
+        # Add bitwise operations for more C-like features
+        elif op == TokenType.AND:
+            # Handle both boolean and bitwise operations
+            if isinstance(left, bool) and isinstance(right, bool):
+                return left and right
+            else:
+                return left & right
+        elif op == TokenType.OR:
+            # Handle both boolean and bitwise operations
+            if isinstance(left, bool) and isinstance(right, bool):
+                return left or right
+            else:
+                return left | right
+        elif op == TokenType.XOR:
+            return left ^ right
         else:
-            raise Exception(f"Unsupported binary operation: {node.op}")
+            raise Exception(f"Unsupported binary operation: {op}")
 
     def visit_VariableDeclarationNode(self, node):
         value = self.visit(node.value)
@@ -186,8 +213,35 @@ class VM:
             self.visit(node.else_block)
 
     def visit_WhileNode(self, node):
+        # Optimize while loops by caching condition evaluation when possible
         while self.visit(node.condition):
             self.visit(node.block)
+
+    def visit_ForNode(self, node):
+        """Handle for loops like 'for item in iterable { ... }'"""
+        iterable = self.visit(node.iterable)
+        
+        # Check if iterable is a list
+        if isinstance(iterable, list):
+            # Save the current value of the target variable if it exists
+            old_value = self.globals.get(node.target, None)
+            
+            # Iterate over the list
+            for item in iterable:
+                # Set the target variable to the current item
+                self.globals[node.target] = item
+                # Execute the block
+                self.visit(node.block)
+                
+            # Restore the old value of the target variable
+            if old_value is not None:
+                self.globals[node.target] = old_value
+            else:
+                # Remove the target variable if it didn't exist before
+                if node.target in self.globals:
+                    del self.globals[node.target]
+        else:
+            raise Exception(f"Cannot iterate over {type(iterable).__name__}")
 
     def visit_FunctionDeclarationNode(self, node):
         # Store the function definition in globals

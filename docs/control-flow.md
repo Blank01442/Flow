@@ -118,7 +118,7 @@ print n, "! =", factorial
 
 ### For Loops
 
-For loops iterate over elements in a list:
+For loops iterate over elements in a list or range:
 
 ```flow
 for item in list {
@@ -147,6 +147,11 @@ print "Sum:", total
 let rangeList = range(5)  # [0, 1, 2, 3, 4]
 for i in rangeList {
     print "Index:", i
+}
+
+# Direct range usage
+for i in range(3) {
+    print "Count:", i
 }
 ```
 

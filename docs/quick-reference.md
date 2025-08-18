@@ -46,7 +46,17 @@ while condition {
 for item in list {
     # code
 }
+
+# With range
+for i in range(5) {
+    # code
+}
 ```
+
+### Bitwise Operators
+- `&` - Bitwise AND
+- `|` - Bitwise OR
+- `^` - Bitwise XOR
 
 ## Functions
 
@@ -87,6 +97,7 @@ let length = len(list)   # Get length
 - `log(number)` - Natural logarithm
 - `floor(number)` - Round down
 - `ceil(number)` - Round up
+- `round(number, digits)` - Round to specified decimal places
 
 ### List Functions
 - `len(list)` - Get list length
@@ -95,21 +106,30 @@ let length = len(list)   # Get length
 - `max(list)` - Maximum value in list
 - `min(list)` - Minimum value in list
 - `range(count)` - Create list [0, 1, ..., count-1]
+- `sort(list)` - Sort list in place
+- `reverse(list)` - Reverse list in place
+- `contains(list, item)` - Check if item is in list
 
-### File I/O Functions
-- `read_file(filename)` - Read file contents
-- `write_file(filename, content)` - Write content to file
+### String Functions
+- `ord(char)` - Get ASCII value of character
+- `chr(number)` - Get character from ASCII value
+- `hex(number)` - Convert to hexadecimal string
+- `bin(number)` - Convert to binary string
 
-### System Functions
-- `time()` - Get current timestamp
-- `os_system(command)` - Execute system command
-- `exit(code)` - Exit program
+### Random Functions
+- `random()` - Generate random float 0.0-1.0
+- `randint(min, max)` - Generate random integer
+- `shuffle(list)` - Shuffle list in place
 
-### Utility Functions
+### Type and Conversion Functions
 - `type(value)` - Get type of value
 - `str(value)` - Convert to string
 - `int(value)` - Convert to integer
 - `float(value)` - Convert to float
+
+### Input/Output Functions
+- `input(prompt)` - Get user input
+- `exit(code)` - Exit program
 
 ## Operators
 

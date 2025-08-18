@@ -61,11 +61,11 @@ Flow supports several built-in data types:
    let mixed = ["text", 42, true]
    ```
 
-## Operators
+### Operators
 
 Flow supports common operators for mathematical and logical operations:
 
-### Arithmetic Operators
+#### Arithmetic Operators
 - `+` : Addition
 - `-` : Subtraction
 - `*` : Multiplication
@@ -73,7 +73,7 @@ Flow supports common operators for mathematical and logical operations:
 - `%` : Modulo (remainder)
 - `**` : Exponentiation
 
-### Comparison Operators
+#### Comparison Operators
 - `==` : Equal to
 - `!=` : Not equal to
 - `<` : Less than
@@ -81,16 +81,29 @@ Flow supports common operators for mathematical and logical operations:
 - `>` : Greater than
 - `>=` : Greater than or equal to
 
-### Logical Operators
+#### Logical Operators
 - `and` : Logical AND
 - `or` : Logical OR
 - `not` : Logical NOT
 
-### Examples
+#### Bitwise Operators
+- `&` : Bitwise AND
+- `|` : Bitwise OR
+- `^` : Bitwise XOR
+- `~` : Bitwise NOT (not yet implemented)
+
+#### Examples
 ```flow
 let sum = 5 + 3        # 8
 let isEqual = 5 == 3   # false
 let isTrue = true and false  # false
+
+# Bitwise operations
+let a = 5  # Binary: 101
+let b = 3  # Binary: 011
+let andResult = a & b  # 1 (Binary: 001)
+let orResult = a | b   # 7 (Binary: 111)
+let xorResult = a ^ b  # 6 (Binary: 110)
 ```
 
 ## Control Flow

@@ -62,6 +62,12 @@ class WhileNode(ASTNode):
         self.condition = condition
         self.block = block
 
+class ForNode(ASTNode):
+    def __init__(self, target, iterable, block):
+        self.target = target
+        self.iterable = iterable
+        self.block = block
+
 class FunctionDeclarationNode(ASTNode):
     def __init__(self, name, params, body):
         self.name = name
@@ -154,6 +160,8 @@ class Parser:
             return self.parse_if_statement()
         elif self.current_token.type == TokenType.WHILE:
             return self.parse_while_statement()
+        elif self.current_token.type == TokenType.FOR:
+            return self.parse_for_statement()
         elif self.current_token.type == TokenType.RETURN:
             self.advance()
             value = self.parse_expression()
@@ -234,6 +242,30 @@ class Parser:
         condition = self.parse_expression()
         block = self.parse_block()
         return WhileNode(condition, block)
+
+    def parse_for_statement(self):
+        """Parse for loops like 'for item in iterable { ... }'"""
+        self.advance() # Consume 'for'
+        
+        # Parse the target variable
+        if self.current_token.type != TokenType.IDENTIFIER:
+            raise Exception("Expected identifier after 'for'")
+        target = self.current_token.value
+        self.advance()
+        
+        # Parse 'in' keyword
+        if self.current_token.type != TokenType.IN:
+            raise Exception("Expected 'in' after target variable in for loop")
+        self.advance()
+        
+        # Parse the iterable expression
+        iterable = self.parse_expression()
+        
+        # Parse the block
+        block = self.parse_block()
+        
+        # Create a for loop node
+        return ForNode(target, iterable, block)
 
     def parse_block(self):
         self.advance() # Consume '{'

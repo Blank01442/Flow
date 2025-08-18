@@ -8,7 +8,8 @@ BUILTINS = [
     'read_file', 'write_file', 'os_system', 'len', 'str', 'int', 'float', 
     'abs', 'min', 'max', 'sum', 'range', 'append', 'pop', 'split', 'join',
     'time', 'sleep', 'sqrt', 'pow', 'log', 'sin', 'cos', 'tan', 'json_parse',
-    'json_stringify'
+    'json_stringify', 'floor', 'ceil', 'round', 'type', 'ord', 'chr', 'hex', 'bin',
+    'input', 'exit', 'random', 'randint', 'shuffle', 'sort', 'reverse', 'contains'
 ]
 
 # Cache for file operations to avoid repeated file system calls
@@ -158,6 +159,81 @@ def time():
 def sleep(seconds):
     """Sleep for specified seconds"""
     __builtins__['time.sleep'](seconds)
+
+# Additional Math functions
+def floor(num):
+    """Round number down to nearest integer"""
+    return math.floor(num)
+
+def ceil(num):
+    """Round number up to nearest integer"""
+    return math.ceil(num)
+
+def round(num, ndigits=0):
+    """Round number to nearest integer or to specified decimal places"""
+    return __builtins__['round'](num, ndigits)
+
+# Type functions
+def type(obj):
+    """Get the type of an object"""
+    return __builtins__['type'](obj).__name__
+
+# String functions
+def ord(char):
+    """Get ASCII value of character"""
+    return __builtins__['ord'](char)
+
+def chr(num):
+    """Get character from ASCII value"""
+    return __builtins__['chr'](num)
+
+def hex(num):
+    """Convert number to hexadecimal string"""
+    return __builtins__['hex'](num)
+
+def bin(num):
+    """Convert number to binary string"""
+    return __builtins__['bin'](num)
+
+# Input/Output functions
+def input(prompt=""):
+    """Get input from user"""
+    return __builtins__['input'](prompt)
+
+def exit(code=0):
+    """Exit the program with optional exit code"""
+    __builtins__['exit'](code)
+
+# Random functions
+import random as _random
+
+def random():
+    """Generate random float between 0.0 and 1.0"""
+    return _random.random()
+
+def randint(a, b):
+    """Generate random integer between a and b (inclusive)"""
+    return _random.randint(a, b)
+
+def shuffle(lst):
+    """Shuffle list in place"""
+    _random.shuffle(lst)
+    return lst
+
+# List functions
+def sort(lst, reverse=False):
+    """Sort list in place"""
+    lst.sort(reverse=reverse)
+    return lst
+
+def reverse(lst):
+    """Reverse list in place"""
+    lst.reverse()
+    return lst
+
+def contains(sequence, item):
+    """Check if item is in sequence"""
+    return item in sequence
 
 # JSON functions
 def json_parse(string):

@@ -7,6 +7,8 @@ class TokenType(Enum):
     IF = r'if'
     ELSE = r'else'
     WHILE = r'while'
+    FOR = r'for'
+    IN = r'in'
     LET = r'let'
     FUNC = r'func'
     RETURN = r'return'
@@ -25,6 +27,7 @@ class TokenType(Enum):
     MINUS = r'-'
     MULTIPLY = r'\*'
     DIVIDE = r'/'
+    MODULO = r'%'
     LPAREN = r'\('
     RPAREN = r'\)'
     LBRACKET = r'\['
@@ -38,6 +41,10 @@ class TokenType(Enum):
     EQUAL_EQUAL = r'=='
     LESS_EQUAL = r'<='
     GREATER_EQUAL = r'>='
+    AND = r'and|&'
+    OR = r'or|\|'
+    XOR = r'\^'
+    NOT = r'not|~'
 
     # Other
     NEWLINE = r'\n'
@@ -70,27 +77,36 @@ class Lexer:
     
     def _compile_patterns(self):
         """Pre-compile all regex patterns for better performance"""
+        # Order matters! More specific patterns should come first
         self.patterns = [
             (TokenType.PRINT, re.compile(r'print')),
             (TokenType.IF, re.compile(r'if')),
             (TokenType.ELSE, re.compile(r'else')),
             (TokenType.WHILE, re.compile(r'while')),
+            (TokenType.FOR, re.compile(r'for')),
+            (TokenType.IN, re.compile(r'in')),
             (TokenType.LET, re.compile(r'let')),
             (TokenType.FUNC, re.compile(r'func')),
             (TokenType.RETURN, re.compile(r'return')),
             (TokenType.EXTERN, re.compile(r'extern')),
             (TokenType.BOOLEAN, re.compile(r'true|false')),
-            (TokenType.IDENTIFIER, re.compile(r'[a-zA-Z_][a-zA-Z0-9_]*')),
             (TokenType.FLOAT, re.compile(r'\d+\.\d+')),
             (TokenType.INTEGER, re.compile(r'\d+')),
             (TokenType.STRING, re.compile(r'"(?:\\.|[^\\"])*"')),
             (TokenType.NOT_EQUALS, re.compile(r'!=')),
             (TokenType.EQUAL_EQUAL, re.compile(r'==')),
+            (TokenType.LESS_EQUAL, re.compile(r'<=')),
+            (TokenType.GREATER_EQUAL, re.compile(r'>=')),
             (TokenType.EQUALS, re.compile(r'=')),
             (TokenType.PLUS, re.compile(r'\+')),
             (TokenType.MINUS, re.compile(r'-')),
             (TokenType.MULTIPLY, re.compile(r'\*')),
             (TokenType.DIVIDE, re.compile(r'/')),
+            (TokenType.MODULO, re.compile(r'%')),
+            (TokenType.AND, re.compile(r'and')),
+            (TokenType.OR, re.compile(r'or')),
+            (TokenType.XOR, re.compile(r'\^')),
+            (TokenType.NOT, re.compile(r'not')),
             (TokenType.LPAREN, re.compile(r'\(')),
             (TokenType.RPAREN, re.compile(r'\)')),
             (TokenType.LBRACKET, re.compile(r'\[')),
@@ -98,10 +114,9 @@ class Lexer:
             (TokenType.LBRACE, re.compile(r'\{')),
             (TokenType.RBRACE, re.compile(r'\}')),
             (TokenType.COMMA, re.compile(r',')),
-            (TokenType.LESS_EQUAL, re.compile(r'<=')),
-            (TokenType.GREATER_EQUAL, re.compile(r'>=')),
             (TokenType.LESS_THAN, re.compile(r'<')),
             (TokenType.GREATER_THAN, re.compile(r'>')),
+            (TokenType.IDENTIFIER, re.compile(r'[a-zA-Z_][a-zA-Z0-9_]*')),
             (TokenType.NEWLINE, re.compile(r'\n')),
             (TokenType.WHITESPACE, re.compile(r'[ \t]+')),
             (TokenType.COMMENT, re.compile(r'#.*')),

@@ -58,6 +58,16 @@ while i < 5 {
     print "Count:", i
     i = i + 1
 }
+
+# For loops (new feature)
+for item in [1, 2, 3, 4, 5] {
+    print "Item:", item
+}
+
+# Range-based for loops (new feature)
+for i in range(5) {
+    print "Index:", i
+}
 ```
 
 ### Functions
@@ -84,6 +94,21 @@ let length = len("Hello")        # 5
 let root = sqrt(16)              # 4.0
 let numbers = range(5)           # [0, 1, 2, 3, 4]
 let words = split("a,b,c", ",")  # ["a", "b", "c"]
+
+# New built-in functions
+let floored = floor(3.7)         # 3
+let ceiled = ceil(3.2)           # 4
+let rounded = round(3.14159, 2)  # 3.14
+let randomNum = random()         # Random float 0.0-1.0
+```
+
+### Bitwise Operations (new feature)
+```flow
+let a = 5  # Binary: 101
+let b = 3  # Binary: 011
+let andResult = a & b  # 1 (Binary: 001)
+let orResult = a | b   # 7 (Binary: 111)
+let xorResult = a ^ b  # 6 (Binary: 110)
 ```
 
 ## Performance Features

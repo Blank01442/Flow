@@ -1,0 +1,41 @@
+# Simple test of new features
+print "Testing new Flow features"
+
+# For loop with range
+print "For loop with range:"
+for i in range(3) {
+    print "Count:", i
+}
+
+# For loop with list
+print "For loop with list:"
+let items = ["apple", "banana", "cherry"]
+for item in items {
+    print "Fruit:", item
+}
+
+# Additional math functions
+print "Math functions:"
+print "floor(3.7) =", floor(3.7)
+print "ceil(3.2) =", ceil(3.2)
+print "round(3.14159, 2) =", round(3.14159, 2)
+
+# Type checking
+print "Type checking:"
+print "Type of 42 is", type(42)
+print "Type of 'hello' is", type("hello")
+
+# String functions
+print "String functions:"
+print "ASCII of 'A' is", ord("A")
+print "Character for 65 is", chr(65)
+
+# List functions
+print "List functions:"
+let numbers = [3, 1, 4, 1, 5]
+print "Original:", numbers
+print "Contains 4?", contains(numbers, 4)
+sort(numbers)
+print "Sorted:", numbers
+reverse(numbers)
+print "Reversed:", numbers

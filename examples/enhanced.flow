@@ -1,0 +1,64 @@
+# Enhanced Flow Features Example
+print "Enhanced Flow Features Demo"
+
+# For loops
+print "For loop example:"
+let numbers = [1, 2, 3, 4, 5]
+for num in numbers {
+    print "Number:", num
+}
+
+# Range function with for loop
+print "Range with for loop:"
+for i in range(5) {
+    print "Index:", i
+}
+
+# Bitwise operations
+print "Bitwise operations:"
+let a = 5  # Binary: 101
+let b = 3  # Binary: 011
+print "a & b =", a and b  # 1 (Binary: 001)
+print "a | b =", a or b  # 7 (Binary: 111)
+print "a ^ b =", a ^ b  # 6 (Binary: 110)
+
+# Additional math functions
+print "Math functions:"
+let pi = 3.14159
+print "floor(3.7) =", floor(3.7)
+print "ceil(3.2) =", ceil(3.2)
+print "round(3.14159, 2) =", round(3.14159, 2)
+
+# Type checking
+print "Type checking:"
+let value = 42
+print "Type of", value, "is", type(value)
+let text = "Hello"
+print "Type of", text, "is", type(text)
+
+# String functions
+print "String functions:"
+let char = "A"
+print "ASCII value of", char, "=", ord(char)
+print "Character for ASCII 65 =", chr(65)
+print "Hex of 255 =", hex(255)
+print "Binary of 10 =", bin(10)
+
+# List manipulation
+print "List manipulation:"
+let items = [3, 1, 4, 1, 5, 9, 2, 6]
+print "Original list:", items
+print "Sorted list:", sort(items)
+print "Reversed list:", reverse(items)
+print "List contains 5?", contains(items, 5)
+
+# Random functions
+print "Random functions:"
+let randomFloat = random()
+print "Random float:", randomFloat
+let randomInt = randint(1, 10)
+print "Random integer (1-10):", randomInt
+
+let deck = [1, 2, 3, 4, 5]
+print "Original deck:", deck
+print "Shuffled deck:", shuffle(deck)
