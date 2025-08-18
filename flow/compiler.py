@@ -1,7 +1,15 @@
 
-from .parser import (ProgramNode, PrintNode, StringNode, NumberNode, 
-                     BinOpNode, VariableDeclarationNode, VariableAccessNode,
-                     IfNode, FunctionDeclarationNode, FunctionCallNode, ReturnNode, BlockNode)
+from .parser import (ProgramNode, PrintNode, StringNode, IntegerNode, FloatNode, BooleanNode,
+                     BinOpNode, VariableDeclarationNode, VariableAccessNode, AssignmentNode,
+                     IfNode, WhileNode, ForNode, MatchNode, CaseNode, AssignmentExpressionNode,
+                     FunctionDeclarationNode, FunctionCallNode, ReturnNode, BlockNode,
+                     ExternFunctionDeclarationNode, BuiltinFunctionCallNode, ListNode,
+                     IndexAccessNode, IndexAssignmentNode, UnaryOpNode, GenericFunctionDeclarationNode,
+                     GenericTypeNode, LiteralPatternNode, VariablePatternNode,
+                     TuplePatternNode, ConstructorPatternNode, TupleNode, MutableDeclarationNode,
+                     ImmutableDeclarationNode, AllocNode, FreeNode, RefNode, DerefNode,
+                     MacroDefinitionNode, MacroCallNode, CompileTimeEvalNode, AnnotatedNode,
+                     PatternNode)
 from .lexer import TokenType
 from .bytecode import OpCode, CompareOp
 
@@ -42,8 +50,66 @@ class Compiler:
     def visit_StringNode(self, node):
         self.emit(OpCode.LOAD_CONST, self.add_constant(node.value))
 
-    def visit_NumberNode(self, node):
+    def visit_IntegerNode(self, node):
         self.emit(OpCode.LOAD_CONST, self.add_constant(node.value))
+
+    def visit_FloatNode(self, node):
+        self.emit(OpCode.LOAD_CONST, self.add_constant(node.value))
+
+    def visit_BooleanNode(self, node):
+        self.emit(OpCode.LOAD_CONST, self.add_constant(node.value))
+
+    def visit_ListNode(self, node):
+        # Load list elements
+        for element in node.elements:
+            self.visit(element)
+        # Create list with specified size
+        self.emit(OpCode.BUILD_LIST, len(node.elements))
+
+    def visit_TupleNode(self, node):
+        # Load tuple elements
+        for element in node.elements:
+            self.visit(element)
+        # Create tuple with specified size
+        self.emit(OpCode.BUILD_TUPLE, len(node.elements))
+
+    def visit_AssignmentNode(self, node):
+        self.visit(node.value)
+        if len(self._locals_stack) > 1: # Inside a function
+            current_locals = self._locals_stack[-1]
+            current_local_count = self._local_count_stack[-1]
+            if node.identifier not in current_locals:
+                current_locals[node.identifier] = current_local_count
+                self._local_count_stack[-1] += 1
+            self.emit(OpCode.STORE_FAST, current_locals[node.identifier])
+        else: # Global scope
+            self.emit(OpCode.STORE_NAME, self.add_constant(node.identifier))
+
+    def visit_MutableDeclarationNode(self, node):
+        # Treat mutable declarations the same as regular assignments for now
+        self.visit(node.value)
+        if len(self._locals_stack) > 1: # Inside a function
+            current_locals = self._locals_stack[-1]
+            current_local_count = self._local_count_stack[-1]
+            if node.identifier not in current_locals:
+                current_locals[node.identifier] = current_local_count
+                self._local_count_stack[-1] += 1
+            self.emit(OpCode.STORE_FAST, current_locals[node.identifier])
+        else: # Global scope
+            self.emit(OpCode.STORE_NAME, self.add_constant(node.identifier))
+
+    def visit_ImmutableDeclarationNode(self, node):
+        # Treat immutable declarations the same as regular assignments for now
+        self.visit(node.value)
+        if len(self._locals_stack) > 1: # Inside a function
+            current_locals = self._locals_stack[-1]
+            current_local_count = self._local_count_stack[-1]
+            if node.identifier not in current_locals:
+                current_locals[node.identifier] = current_local_count
+                self._local_count_stack[-1] += 1
+            self.emit(OpCode.STORE_FAST, current_locals[node.identifier])
+        else: # Global scope
+            self.emit(OpCode.STORE_NAME, self.add_constant(node.identifier))
 
     def visit_BinOpNode(self, node):
         self.visit(node.left)
@@ -107,7 +173,9 @@ class Compiler:
         self.emit(OpCode.JUMP, loop_start_pos) # Jump back to the beginning of the loop
         self.bytecode[jump_if_false_pos] = (OpCode.JUMP_IF_FALSE, len(self.bytecode)) # Set jump target to after the loop
 
-    def visit_FunctionDeclarationNode(self, node):
+    def visit_GenericFunctionDeclarationNode(self, node):
+        # Handle generic function declaration
+        # For now, we'll treat it like a regular function but store type parameter info
         # Push a new local scope
         self._locals_stack.append({})
         self._local_count_stack.append(0)
@@ -122,6 +190,9 @@ class Compiler:
 
         # Compile the function body
         compiler = Compiler()
+        # Set up the same local scope for the new compiler
+        compiler._locals_stack = [current_locals.copy()]
+        compiler._local_count_stack = [current_local_count]
         compiler.compile(node.body)
         func_bytecode, func_constants = compiler.bytecode, compiler.constants
 
@@ -136,7 +207,8 @@ class Compiler:
             'constants': func_constants,
             'params': node.params,
             'num_locals': self._local_count_stack[-1], # Number of local variables
-            'local_names': local_names # Names of local variables in order of indices
+            'local_names': local_names, # Names of local variables in order of indices
+            'type_params': node.type_params # Store type parameter info
         }
         # Store the code object as a constant
         self.emit(OpCode.LOAD_CONST, self.add_constant(code_obj))

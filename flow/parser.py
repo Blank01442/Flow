@@ -5,29 +5,50 @@ from .builtins import BUILTINS
 class ASTNode:
     pass
 
+
 class ProgramNode(ASTNode):
     def __init__(self, statements):
         self.statements = statements
+
 
 class PrintNode(ASTNode):
     def __init__(self, values):
         self.values = values
 
+
 class StringNode(ASTNode):
     def __init__(self, value):
         self.value = value
+
 
 class IntegerNode(ASTNode):
     def __init__(self, value):
         self.value = int(value)
 
+
 class FloatNode(ASTNode):
     def __init__(self, value):
         self.value = float(value)
 
+
 class BooleanNode(ASTNode):
     def __init__(self, value):
         self.value = value == "true"
+
+
+# Generic/Template nodes
+class GenericTypeNode(ASTNode):
+    def __init__(self, base_type, type_params):
+        self.base_type = base_type
+        self.type_params = type_params
+
+
+class GenericFunctionDeclarationNode(ASTNode):
+    def __init__(self, name, type_params, params, body):
+        self.name = name
+        self.type_params = type_params  # List of type parameter names
+        self.params = params
+        self.body = body
 
 class BinOpNode(ASTNode):
     def __init__(self, left, op, right):
@@ -74,10 +95,37 @@ class MatchNode(ASTNode):
         self.cases = cases
         self.default_case = default_case
 
+
 class CaseNode(ASTNode):
     def __init__(self, pattern, block):
         self.pattern = pattern
         self.block = block
+
+
+# Enhanced pattern matching nodes
+class PatternNode(ASTNode):
+    pass
+
+
+class LiteralPatternNode(PatternNode):
+    def __init__(self, value):
+        self.value = value
+
+
+class VariablePatternNode(PatternNode):
+    def __init__(self, name):
+        self.name = name
+
+
+class TuplePatternNode(PatternNode):
+    def __init__(self, elements):
+        self.elements = elements
+
+
+class ConstructorPatternNode(PatternNode):
+    def __init__(self, constructor, args):
+        self.constructor = constructor
+        self.args = args
 
 class AssignmentExpressionNode(ASTNode):
     def __init__(self, identifier, value):
@@ -118,6 +166,12 @@ class ListNode(ASTNode):
     def __init__(self, elements):
         self.elements = elements
 
+
+class TupleNode(ASTNode):
+    def __init__(self, elements):
+        self.elements = elements
+
+
 class ListComprehensionNode(ASTNode):
     def __init__(self, expression, target, iterable, condition=None):
         self.expression = expression
@@ -125,10 +179,12 @@ class ListComprehensionNode(ASTNode):
         self.iterable = iterable
         self.condition = condition
 
+
 class IndexAccessNode(ASTNode):
     def __init__(self, obj, index):
         self.obj = obj
         self.index = index
+
 
 class IndexAssignmentNode(ASTNode):
     def __init__(self, obj, index, value):
@@ -136,10 +192,72 @@ class IndexAssignmentNode(ASTNode):
         self.index = index
         self.value = value
 
+
 class UnaryOpNode(ASTNode):
     def __init__(self, op, operand):
         self.op = op
         self.operand = operand
+
+
+# Memory management nodes
+class AllocNode(ASTNode):
+    def __init__(self, type_name, size=None):
+        self.type_name = type_name
+        self.size = size  # For arrays
+
+
+class FreeNode(ASTNode):
+    def __init__(self, expression):
+        self.expression = expression
+
+
+class RefNode(ASTNode):
+    def __init__(self, expression):
+        self.expression = expression
+
+
+class DerefNode(ASTNode):
+    def __init__(self, expression):
+        self.expression = expression
+
+
+# Immutable/mutable declarations
+class MutableDeclarationNode(ASTNode):
+    def __init__(self, identifier, value):
+        self.identifier = identifier
+        self.value = value
+
+
+class ImmutableDeclarationNode(ASTNode):
+    def __init__(self, identifier, value):
+        self.identifier = identifier
+        self.value = value
+
+
+# Macro nodes
+class MacroDefinitionNode(ASTNode):
+    def __init__(self, name, params, body):
+        self.name = name
+        self.params = params
+        self.body = body
+
+
+class MacroCallNode(ASTNode):
+    def __init__(self, name, args):
+        self.name = name
+        self.args = args
+
+
+class CompileTimeEvalNode(ASTNode):
+    def __init__(self, expression):
+        self.expression = expression
+
+
+# Attribute/annotation nodes
+class AnnotatedNode(ASTNode):
+    def __init__(self, annotations, node):
+        self.annotations = annotations  # List of annotation strings
+        self.node = node
 
 # --- Parser ---
 class Parser:
@@ -170,7 +288,9 @@ class Parser:
             return PrintNode(values)
         elif self.current_token.type == TokenType.LET:
             return self.parse_variable_declaration()
-        elif self.current_token.type == TokenType.FUNC:
+        elif self.current_token.type == TokenType.MUT:
+            return self.parse_mutable_declaration()
+        elif self.current_token.type == TokenType.FUNC or self.current_token.type == TokenType.FN:
             return self.parse_function_declaration()
         elif self.current_token.type == TokenType.IF:
             return self.parse_if_statement()
@@ -186,6 +306,14 @@ class Parser:
             return ReturnNode(value)
         elif self.current_token.type == TokenType.EXTERN:
             return self.parse_extern_function_declaration()
+        elif self.current_token.type == TokenType.ALLOC:
+            return self.parse_alloc_statement()
+        elif self.current_token.type == TokenType.FREE:
+            return self.parse_free_statement()
+        elif self.current_token.type == TokenType.MACRO:
+            return self.parse_macro_definition()
+        elif self.current_token.type == TokenType.AT:
+            return self.parse_annotated_statement()
         elif self.current_token.type == TokenType.IDENTIFIER: # Check for assignment
             # Peek ahead to see if it's an assignment
             next_token = self.tokens[self.pos + 1] if self.pos + 1 < len(self.tokens) else None
@@ -220,10 +348,36 @@ class Parser:
         self.advance() # Consume identifier
         self.advance() # Consume '='
         value = self.parse_expression()
-        return VariableDeclarationNode(identifier, value)
+        return ImmutableDeclarationNode(identifier, value)
 
-    def parse_function_declaration(self):
-        self.advance() # Consume 'func'
+    def parse_mutable_declaration(self):
+        self.advance() # Consume 'mut'
+        identifier = self.current_token.value
+        self.advance() # Consume identifier
+        self.advance() # Consume '='
+        value = self.parse_expression()
+        return MutableDeclarationNode(identifier, value)
+
+    def parse_alloc_statement(self):
+        self.advance() # Consume 'alloc'
+        type_name = self.current_token.value
+        self.advance() # Consume type name
+        
+        size = None
+        if self.current_token.type == TokenType.LBRACKET:
+            self.advance() # Consume '['
+            size = self.parse_expression()
+            self.advance() # Consume ']'
+            
+        return AllocNode(type_name, size)
+
+    def parse_free_statement(self):
+        self.advance() # Consume 'free'
+        expression = self.parse_expression()
+        return FreeNode(expression)
+
+    def parse_macro_definition(self):
+        self.advance() # Consume 'macro'
         name = self.current_token.value
         self.advance() # Consume identifier
         self.advance() # Consume '('
@@ -237,6 +391,55 @@ class Parser:
                 self.advance()
         self.advance() # Consume ')'
         body = self.parse_block()
+        return MacroDefinitionNode(name, params, body)
+
+    def parse_annotated_statement(self):
+        annotations = []
+        while self.current_token.type == TokenType.AT:
+            self.advance() # Consume '@'
+            if self.current_token.type == TokenType.IDENTIFIER:
+                annotations.append(self.current_token.value)
+                self.advance()
+            else:
+                raise Exception("Expected identifier after @ for annotation")
+        
+        # Parse the actual statement
+        statement = self.parse_statement()
+        return AnnotatedNode(annotations, statement)
+
+    def parse_function_declaration(self):
+        self.advance() # Consume 'func' or 'fn'
+        name = self.current_token.value
+        self.advance() # Consume identifier
+        
+        # Check for generic type parameters
+        type_params = []
+        if self.current_token.type == TokenType.LESS_THAN:
+            self.advance() # Consume '<'
+            while self.current_token.type != TokenType.GREATER_THAN:
+                if self.current_token.type == TokenType.TYPE_NAME:
+                    type_params.append(self.current_token.value)
+                    self.advance()
+                    if self.current_token.type == TokenType.COMMA:
+                        self.advance()
+                else:
+                    break
+            self.advance() # Consume '>'
+        
+        self.advance() # Consume '('
+        params = []
+        if self.current_token.type != TokenType.RPAREN:
+            params.append(self.current_token.value)
+            self.advance()
+            while self.current_token.type == TokenType.COMMA:
+                self.advance()
+                params.append(self.current_token.value)
+                self.advance()
+        self.advance() # Consume ')'
+        body = self.parse_block()
+        
+        if type_params:
+            return GenericFunctionDeclarationNode(name, type_params, params, body)
         return FunctionDeclarationNode(name, params, body)
 
     def parse_if_statement(self):
@@ -306,7 +509,7 @@ class Parser:
                 self.advance() # Consume 'case'
                 
                 # Parse the pattern
-                pattern = self.parse_expression()
+                pattern = self.parse_pattern()
                 
                 # Parse the colon
                 if self.current_token.type != TokenType.COLON:
@@ -350,6 +553,49 @@ class Parser:
         self.advance()
         
         return MatchNode(expression, cases, default_case)
+
+    def parse_pattern(self):
+        """Parse a pattern for match statements"""
+        if self.current_token.type == TokenType.INTEGER:
+            value = int(self.current_token.value)
+            self.advance()
+            return LiteralPatternNode(value)
+        elif self.current_token.type == TokenType.STRING:
+            value = self.current_token.value
+            self.advance()
+            return LiteralPatternNode(value)
+        elif self.current_token.type == TokenType.IDENTIFIER:
+            # This could be a variable pattern or a constructor pattern
+            name = self.current_token.value
+            self.advance()
+            
+            # If followed by '(', it's a constructor pattern
+            if self.current_token and self.current_token.type == TokenType.LPAREN:
+                self.advance() # Consume '('
+                args = []
+                if self.current_token.type != TokenType.RPAREN:
+                    args.append(self.parse_pattern())
+                    while self.current_token.type == TokenType.COMMA:
+                        self.advance()
+                        args.append(self.parse_pattern())
+                self.advance() # Consume ')'
+                return ConstructorPatternNode(name, args)
+            
+            # Otherwise, it's a variable pattern
+            return VariablePatternNode(name)
+        elif self.current_token.type == TokenType.LPAREN:
+            # Tuple pattern
+            self.advance() # Consume '('
+            elements = []
+            if self.current_token.type != TokenType.RPAREN:
+                elements.append(self.parse_pattern())
+                while self.current_token.type == TokenType.COMMA:
+                    self.advance()
+                    elements.append(self.parse_pattern())
+            self.advance() # Consume ')'
+            return TuplePatternNode(elements)
+        else:
+            raise Exception(f"Unexpected token in pattern: {self.current_token}")
 
     def parse_block(self):
         self.advance() # Consume '{'
@@ -455,7 +701,7 @@ class Parser:
                 obj = VariableAccessNode(token.value)
                 return self.parse_index_access(obj)
             return VariableAccessNode(token.value)
-        elif token.type == TokenType.LBRACKET:  # List literal
+        elif token.type == TokenType.LBRACKET or token.type == TokenType.LPAREN:  # List or tuple literal
             return self.parse_list_literal()
         elif token.type == TokenType.LPAREN:
             self.advance()
@@ -480,16 +726,29 @@ class Parser:
         raise Exception(f"Invalid syntax at token {token}")
 
     def parse_list_literal(self):
-        """Parse a list literal like [1, 2, 3]"""
-        self.advance() # Consume '['
-        elements = []
-        if self.current_token and self.current_token.type != TokenType.RBRACKET:
-            elements.append(self.parse_expression())
-            while self.current_token and self.current_token.type == TokenType.COMMA:
-                self.advance()
+        """Parse a list literal like [1, 2, 3] or tuple like (1, 2, 3)"""
+        if self.current_token.type == TokenType.LBRACKET:
+            # List literal
+            self.advance() # Consume '['
+            elements = []
+            if self.current_token and self.current_token.type != TokenType.RBRACKET:
                 elements.append(self.parse_expression())
-        self.advance() # Consume ']'
-        return ListNode(elements)
+                while self.current_token and self.current_token.type == TokenType.COMMA:
+                    self.advance()
+                    elements.append(self.parse_expression())
+            self.advance() # Consume ']'
+            return ListNode(elements)
+        elif self.current_token.type == TokenType.LPAREN:
+            # Tuple literal
+            self.advance() # Consume '('
+            elements = []
+            if self.current_token and self.current_token.type != TokenType.RPAREN:
+                elements.append(self.parse_expression())
+                while self.current_token and self.current_token.type == TokenType.COMMA:
+                    self.advance()
+                    elements.append(self.parse_expression())
+            self.advance() # Consume ')'
+            return TupleNode(elements)
 
     def parse_index_access(self, obj):
         """Parse index access like arr[0]"""

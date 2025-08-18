@@ -10,12 +10,21 @@ class TokenType(Enum):
     FOR = r'for'
     IN = r'in'
     LET = r'let'
+    MUT = r'mut'
     FUNC = r'func'
+    FN = r'fn'
     RETURN = r'return'
     EXTERN = r'extern'
     MATCH = r'match'
     CASE = r'case'
     DEFAULT = r'default'
+    ALLOC = r'alloc'
+    FREE = r'free'
+    REF = r'ref'
+    DEREF = r'deref'
+    MACRO = r'macro'
+    CONST = r'const'
+    EVAL = r'eval'
 
     # Data types
     IDENTIFIER = r'[a-zA-Z_][a-zA-Z0-9_]*'
@@ -23,6 +32,7 @@ class TokenType(Enum):
     INTEGER = r'\d+'
     STRING = r'"(?:\.|[^"])*"'
     BOOLEAN = r'true|false'
+    TYPE_NAME = r'[A-Z][a-zA-Z0-9_]*'  # PascalCase for types
 
     # Operators
     EQUALS = r'='
@@ -39,7 +49,9 @@ class TokenType(Enum):
     LBRACE = r'\{'
     RBRACE = r'\}'
     COLON = r':'
+    SEMICOLON = r';'
     COMMA = r','
+    DOT = r'\.'
     LESS_THAN = r'<'
     GREATER_THAN = r'>'
     NOT_EQUALS = r'!='
@@ -50,6 +62,7 @@ class TokenType(Enum):
     OR = r'or|\|'
     XOR = r'\^'
     NOT = r'not|~'
+    AT = r'@'  # For annotations
 
     # Other
     NEWLINE = r'\n'
@@ -91,12 +104,21 @@ class Lexer:
             (TokenType.FOR, re.compile(r'for')),
             (TokenType.IN, re.compile(r'in')),
             (TokenType.LET, re.compile(r'let')),
+            (TokenType.MUT, re.compile(r'mut')),
             (TokenType.FUNC, re.compile(r'func')),
+            (TokenType.FN, re.compile(r'fn')),
             (TokenType.RETURN, re.compile(r'return')),
             (TokenType.EXTERN, re.compile(r'extern')),
             (TokenType.MATCH, re.compile(r'match')),
             (TokenType.CASE, re.compile(r'case')),
             (TokenType.DEFAULT, re.compile(r'default')),
+            (TokenType.ALLOC, re.compile(r'alloc')),
+            (TokenType.FREE, re.compile(r'free')),
+            (TokenType.REF, re.compile(r'ref')),
+            (TokenType.DEREF, re.compile(r'deref')),
+            (TokenType.MACRO, re.compile(r'macro')),
+            (TokenType.CONST, re.compile(r'const')),
+            (TokenType.EVAL, re.compile(r'eval')),
             (TokenType.BOOLEAN, re.compile(r'true|false')),
             (TokenType.FLOAT, re.compile(r'\d+\.\d+')),
             (TokenType.INTEGER, re.compile(r'\d+')),
@@ -123,10 +145,13 @@ class Lexer:
             (TokenType.RBRACE, re.compile(r'\}')),
             (TokenType.WALRUS, re.compile(r':=')),
             (TokenType.COLON, re.compile(r':')),
+            (TokenType.SEMICOLON, re.compile(r';')),
             (TokenType.COMMA, re.compile(r',')),
+            (TokenType.DOT, re.compile(r'\.')),
             (TokenType.LESS_THAN, re.compile(r'<')),
             (TokenType.GREATER_THAN, re.compile(r'>')),
-            (TokenType.WALRUS, re.compile(r':=')),
+            (TokenType.AT, re.compile(r'@')),
+            (TokenType.TYPE_NAME, re.compile(r'[A-Z][a-zA-Z0-9_]*')),
             (TokenType.IDENTIFIER, re.compile(r'[a-zA-Z_][a-zA-Z0-9_]*')),
             (TokenType.NEWLINE, re.compile(r'\n')),
             (TokenType.WHITESPACE, re.compile(r'[ \t]+')),

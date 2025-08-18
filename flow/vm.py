@@ -52,6 +52,11 @@ class VM:
             OpCode.BINARY_SUBTRACT: self._handle_binary_subtract,
             OpCode.BINARY_MULTIPLY: self._handle_binary_multiply,
             OpCode.BINARY_DIVIDE: self._handle_binary_divide,
+            OpCode.BINARY_MODULO: self._handle_binary_modulo,
+            OpCode.BINARY_POWER: self._handle_binary_power,
+            OpCode.BINARY_AND: self._handle_binary_and,
+            OpCode.BINARY_OR: self._handle_binary_or,
+            OpCode.BINARY_XOR: self._handle_binary_xor,
             OpCode.PRINT: self._handle_print,
             OpCode.JUMP_IF_FALSE: self._handle_jump_if_false,
             OpCode.JUMP: self._handle_jump,
@@ -59,6 +64,13 @@ class VM:
             OpCode.CALL_FUNCTION: self._handle_call_function,
             OpCode.CALL_BUILTIN: self._handle_call_builtin,
             OpCode.COMPARE_OP: self._handle_compare_op,
+            OpCode.UNARY_NEGATIVE: self._handle_unary_negative,
+            OpCode.UNARY_NOT: self._handle_unary_not,
+            OpCode.BUILD_LIST: self._handle_build_list,
+            OpCode.BUILD_TUPLE: self._handle_build_tuple,
+            OpCode.SUBSCR: self._handle_subscr,
+            OpCode.STORE_SUBSCR: self._handle_store_subscr,
+            OpCode.DUP_TOP: self._handle_dup_top,
         }
 
     def run(self, bytecode, constants):
@@ -333,6 +345,11 @@ class VM:
         elements = [self.visit(element) for element in node.elements]
         return elements
 
+    def visit_TupleNode(self, node):
+        """Handle tuple literals"""
+        elements = [self.visit(element) for element in node.elements]
+        return tuple(elements)
+
     def visit_IndexAccessNode(self, node):
         """Handle index access like arr[0]"""
         obj = self.visit(node.obj)
@@ -348,12 +365,54 @@ class VM:
         return value
 
     def visit_UnaryOpNode(self, node):
-        """Handle unary operations like -x"""
         operand = self.visit(node.operand)
         if node.op == TokenType.MINUS:
             return -operand
+        elif node.op == TokenType.NOT:
+            return not operand
         # Add more unary operations as needed
         raise Exception(f"Unsupported unary operation: {node.op}")
+
+    def visit_PatternNode(self, node):
+        """Base pattern node - should not be instantiated directly"""
+        raise Exception("PatternNode should not be visited directly")
+
+    def visit_LiteralPatternNode(self, node):
+        """Handle literal patterns in match statements"""
+        return node.value
+
+    def visit_VariablePatternNode(self, node):
+        """Handle variable patterns in match statements"""
+        return node.name
+
+    def visit_TuplePatternNode(self, node):
+        """Handle tuple patterns in match statements"""
+        return [self.visit(element) for element in node.elements]
+
+    def visit_ConstructorPatternNode(self, node):
+        """Handle constructor patterns in match statements"""
+        return {
+            'constructor': node.constructor,
+            'args': [self.visit(arg) for arg in node.args]
+        }
+
+    def visit_ImmutableDeclarationNode(self, node):
+        """Handle immutable variable declarations"""
+        value = self.visit(node.value)
+        # Store in current scope or globals
+        if hasattr(self, '_current_scope'):
+            self._current_scope[node.identifier] = value
+        else:
+            self.globals[node.identifier] = value
+
+    def visit_MutableDeclarationNode(self, node):
+        """Handle mutable variable declarations"""
+        value = self.visit(node.value)
+        # Store in current scope or globals
+        if hasattr(self, '_current_scope'):
+            self._current_scope[node.identifier] = value
+        else:
+            self.globals[node.identifier] = value
 
     # Bytecode execution handlers (kept for backward compatibility)
     def _handle_load_const(self, frame, operand, constants):
@@ -397,6 +456,56 @@ class VM:
         right = frame.stack.pop()
         left = frame.stack.pop()
         frame.stack.append(left / right)
+
+    def _handle_binary_modulo(self, frame, operand, constants):
+        right = frame.stack.pop()
+        left = frame.stack.pop()
+        frame.stack.append(left % right)
+
+    def _handle_binary_power(self, frame, operand, constants):
+        right = frame.stack.pop()
+        left = frame.stack.pop()
+        frame.stack.append(left ** right)
+
+    def _handle_binary_and(self, frame, operand, constants):
+        right = frame.stack.pop()
+        left = frame.stack.pop()
+        frame.stack.append(left & right)
+
+    def _handle_binary_or(self, frame, operand, constants):
+        right = frame.stack.pop()
+        left = frame.stack.pop()
+        frame.stack.append(left | right)
+
+    def _handle_binary_xor(self, frame, operand, constants):
+        right = frame.stack.pop()
+        left = frame.stack.pop()
+        frame.stack.append(left ^ right)
+
+    def _handle_unary_negative(self, frame, operand, constants):
+        value = frame.stack.pop()
+        frame.stack.append(-value)
+
+    def _handle_unary_not(self, frame, operand, constants):
+        value = frame.stack.pop()
+        frame.stack.append(not value)
+
+    def _handle_subscr(self, frame, operand, constants):
+        index = frame.stack.pop()
+        obj = frame.stack.pop()
+        frame.stack.append(obj[index])
+
+    def _handle_store_subscr(self, frame, operand, constants):
+        value = frame.stack.pop()
+        index = frame.stack.pop()
+        obj = frame.stack.pop()
+        obj[index] = value
+        frame.stack.append(value)
+
+    def _handle_dup_top(self, frame, operand, constants):
+        # Duplicate the top item on the stack
+        if frame.stack:
+            frame.stack.append(frame.stack[-1])
 
     def _handle_print(self, frame, operand, constants):
         value = frame.stack.pop()
@@ -451,6 +560,24 @@ class VM:
                 frame.stack.append(result)
         else:
             raise Exception(f"Built-in function '{func_name}' not found")
+
+    def _handle_build_list(self, frame, operand, constants):
+        # Pop 'operand' elements from the stack and create a list
+        elements = []
+        for _ in range(operand):
+            elements.append(frame.stack.pop())
+        # Elements were popped in reverse order, so reverse them back
+        elements.reverse()
+        frame.stack.append(elements)
+
+    def _handle_build_tuple(self, frame, operand, constants):
+        # Pop 'operand' elements from the stack and create a tuple
+        elements = []
+        for _ in range(operand):
+            elements.append(frame.stack.pop())
+        # Elements were popped in reverse order, so reverse them back
+        elements.reverse()
+        frame.stack.append(tuple(elements))
 
     def _handle_compare_op(self, frame, operand, constants):
         right = frame.stack.pop()
