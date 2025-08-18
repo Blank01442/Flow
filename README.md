@@ -107,6 +107,8 @@ Check out the [examples directory](examples/) for sample programs:
 - [File I/O](examples/fileio.flow)
 - [Math Functions](examples/math.flow)
 
+You can also view the [examples documentation](docs/examples.md) for detailed explanations of each example.
+
 ## Running Programs
 
 ```bash
