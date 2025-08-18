@@ -1,4 +1,4 @@
 # Simple test with built-in function
 
-let x = flow_len("Hello")
+let x = len("Hello")
 print "Length:", x
