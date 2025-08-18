@@ -64,3 +64,37 @@ print "Average:", average
 print "Highest:", highest
 print "Lowest:", lowest
 ```
+
+## Match Statements
+
+```flow
+# Pattern matching example
+let value = 2
+match value {
+    case 1:
+        print "Value is one"
+    case 2:
+        print "Value is two"
+    case 3:
+        print "Value is three"
+    default:
+        print "Value is something else"
+}
+```
+
+## Walrus Operator
+
+```flow
+# Assignment expressions example
+if (x := 5) > 3 {
+    print "x is", x, "which is greater than 3"
+}
+
+# Using walrus operator in a while loop
+let data = [1, 2, 3, 4, 5]
+let i = 0
+while (value := data[i]) < 4 {
+    print "Value is", value
+    i = i + 1
+}
+```

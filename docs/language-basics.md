@@ -86,13 +86,15 @@ Flow supports common operators for mathematical and logical operations:
 - `or` : Logical OR
 - `not` : Logical NOT
 
-#### Bitwise Operators
+### Bitwise Operators
 - `&` : Bitwise AND
 - `|` : Bitwise OR
 - `^` : Bitwise XOR
-- `~` : Bitwise NOT (not yet implemented)
 
-#### Examples
+### Assignment Expression Operator (Walrus Operator)
+- `:=` : Assignment within expressions
+
+### Examples
 ```flow
 let sum = 5 + 3        # 8
 let isEqual = 5 == 3   # false
@@ -104,6 +106,11 @@ let b = 3  # Binary: 011
 let andResult = a & b  # 1 (Binary: 001)
 let orResult = a | b   # 7 (Binary: 111)
 let xorResult = a ^ b  # 6 (Binary: 110)
+
+# Walrus operator
+if (x := 5) > 3 {
+    print "x is", x, "which is greater than 3"
+}
 ```
 
 ## Control Flow
@@ -132,6 +139,23 @@ while condition {
 ```flow
 for item in list {
     # code executed for each item in the list
+}
+
+# With range
+for i in range(5) {
+    # code executed 5 times with i = 0, 1, 2, 3, 4
+}
+```
+
+### Match Statements (Pattern Matching)
+```flow
+match value {
+    case 1:
+        # code executed if value equals 1
+    case 2:
+        # code executed if value equals 2
+    default:
+        # code executed if no case matches
 }
 ```
 

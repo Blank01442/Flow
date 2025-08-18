@@ -53,10 +53,18 @@ for i in range(5) {
 }
 ```
 
-### Bitwise Operators
-- `&` - Bitwise AND
-- `|` - Bitwise OR
-- `^` - Bitwise XOR
+### Match Statements (Pattern Matching)
+
+```flow
+match value {
+    case pattern1:
+        # code
+    case pattern2:
+        # code
+    default:
+        # code
+}
+```
 
 ## Functions
 
@@ -86,6 +94,10 @@ let length = len(list)   # Get length
 - `len(string)` - Get string length
 - `split(string, delimiter)` - Split string into list
 - `substr(string, start, length)` - Extract substring
+- `ord(char)` - Get ASCII value of character
+- `chr(number)` - Get character from ASCII value
+- `hex(number)` - Convert to hexadecimal string
+- `bin(number)` - Convert to binary string
 
 ### Math Functions
 - `abs(number)` - Absolute value
@@ -97,7 +109,7 @@ let length = len(list)   # Get length
 - `log(number)` - Natural logarithm
 - `floor(number)` - Round down
 - `ceil(number)` - Round up
-- `round(number, digits)` - Round to specified decimal places
+- `round(number, decimals)` - Round to specified decimals
 
 ### List Functions
 - `len(list)` - Get list length
@@ -110,11 +122,9 @@ let length = len(list)   # Get length
 - `reverse(list)` - Reverse list in place
 - `contains(list, item)` - Check if item is in list
 
-### String Functions
-- `ord(char)` - Get ASCII value of character
-- `chr(number)` - Get character from ASCII value
-- `hex(number)` - Convert to hexadecimal string
-- `bin(number)` - Convert to binary string
+### File I/O Functions
+- `read_file(filename)` - Read file contents
+- `write_file(filename, content)` - Write content to file
 
 ### Random Functions
 - `random()` - Generate random float 0.0-1.0
@@ -130,6 +140,10 @@ let length = len(list)   # Get length
 ### Input/Output Functions
 - `input(prompt)` - Get user input
 - `exit(code)` - Exit program
+
+### System Functions
+- `time()` - Get current timestamp
+- `os_system(command)` - Execute system command
 
 ## Operators
 
@@ -154,9 +168,13 @@ let length = len(list)   # Get length
 - `or` - Logical OR
 - `not` - Logical NOT
 
-## Error Handling
+### Bitwise
+- `&` - Bitwise AND
+- `|` - Bitwise OR
+- `^` - Bitwise XOR
 
-Flow is working on implementing error handling features. Currently, invalid operations will cause the program to terminate with an error message.
+### Assignment Expression (Walrus Operator)
+- `:=` - Assignment within expressions
 
 ## Comments
 
@@ -170,9 +188,6 @@ Flow is working on implementing error handling features. Currently, invalid oper
 ## Program Structure
 
 ```flow
-# Import modules (if implemented)
-# import module
-
 # Global variables
 let globalVar = "value"
 

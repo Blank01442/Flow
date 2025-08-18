@@ -60,22 +60,61 @@ if score >= 90 {
 }
 ```
 
-### Nested If Statements
+### Match Statements (Pattern Matching)
 
-You can nest if statements inside other if statements:
+Match statements provide a powerful way to handle multiple conditions based on the value of an expression:
 
 ```flow
-let temperature = 75
-let isSunny = true
+match expression {
+    case pattern1:
+        # code executed if expression matches pattern1
+    case pattern2:
+        # code executed if expression matches pattern2
+    default:
+        # code executed if no pattern matches
+}
+```
 
-if temperature > 70 {
-    if isSunny {
-        print "Perfect weather for outdoor activities!"
-    } else {
-        print "Nice temperature but cloudy"
-    }
-} else {
-    print "It's a bit chilly today"
+#### Examples
+
+```flow
+# Simple value matching
+let value = 2
+match value {
+    case 1:
+        print "Value is one"
+    case 2:
+        print "Value is two"
+    case 3:
+        print "Value is three"
+    default:
+        print "Value is something else"
+}
+
+# String matching
+let status = "success"
+match status {
+    case "pending":
+        print "Request is pending"
+    case "success":
+        print "Request succeeded"
+    case "error":
+        print "Request failed"
+    default:
+        print "Unknown status"
+}
+
+# Matching with expressions
+let x = 5
+let y = 3
+let result = x + y
+match result {
+    case 8:
+        print "The sum is 8"
+    case 9:
+        print "The sum is 9"
+    default:
+        print "The sum is", result
 }
 ```
 
