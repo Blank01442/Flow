@@ -1,0 +1,33 @@
+# Calculator Example
+print "Simple Calculator"
+
+func add(a, b) {
+    return a + b
+}
+
+func subtract(a, b) {
+    return a - b
+}
+
+func multiply(a, b) {
+    return a * b
+}
+
+func divide(a, b) {
+    if b == 0 {
+        print "Error: Division by zero"
+        return 0
+    }
+    return a / b
+}
+
+# Test the calculator
+let x = 10
+let y = 5
+
+print "x =", x
+print "y =", y
+print "x + y =", add(x, y)
+print "x - y =", subtract(x, y)
+print "x * y =", multiply(x, y)
+print "x / y =", divide(x, y)

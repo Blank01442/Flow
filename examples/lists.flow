@@ -1,0 +1,48 @@
+# List Operations Example
+print "List Operations Demo"
+
+# Create a list
+let numbers = [1, 2, 3, 4, 5]
+print "Original list:", numbers
+
+# Add elements
+append(numbers, 6)
+append(numbers, 7)
+print "After appending:", numbers
+
+# Access elements
+let first = numbers[0]
+let last = numbers[len(numbers) - 1]
+print "First element:", first
+print "Last element:", last
+
+# Modify elements
+numbers[0] = 10
+print "After modification:", numbers
+
+# Remove elements
+let removed = pop(numbers)
+print "Removed element:", removed
+print "After popping:", numbers
+
+# Calculate statistics
+let total = sum(numbers)
+let count = len(numbers)
+let average = total / count
+let maximum = max(numbers)
+let minimum = min(numbers)
+
+print "Sum:", total
+print "Count:", count
+print "Average:", average
+print "Maximum:", maximum
+print "Minimum:", minimum
+
+# Create ranges
+let range1 = range(5)
+let range2 = range(2, 8)
+let range3 = range(0, 10, 2)
+
+print "Range 0-4:", range1
+print "Range 2-7:", range2
+print "Range 0-10 step 2:", range3

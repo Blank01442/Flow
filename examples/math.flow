@@ -1,0 +1,37 @@
+# Math Functions Example
+print "Math Functions Demo"
+
+let number = 16
+let negative = -42
+
+print "Number:", number
+print "Negative:", negative
+
+# Absolute value
+print "Absolute of", negative, "=", abs(negative)
+
+# Square root
+print "Square root of", number, "=", sqrt(number)
+
+# Power
+print "2 to the power of 3 =", pow(2, 3)
+
+# Trigonometric functions
+let angle = 3.14159 / 2  # 90 degrees in radians
+print "Sine of 90° =", sin(angle)
+print "Cosine of 90° =", cos(angle)
+print "Tangent of 45° =", tan(3.14159 / 4)
+
+# Logarithm
+print "Natural log of", number, "=", log(number)
+
+# Min/Max
+let a = 10
+let b = 20
+print "Min of", a, "and", b, "=", min(a, b)
+print "Max of", a, "and", b, "=", max(a, b)
+
+# Range function
+let numbers = range(1, 11)  # 1 to 10
+let total = sum(numbers)
+print "Sum of 1 to 10 =", total

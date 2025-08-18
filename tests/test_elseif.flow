@@ -1,0 +1,6 @@
+let average = 85
+if average >= 90 {
+    print "Excellent"
+} else if average >= 80 {
+    print "Good"
+}

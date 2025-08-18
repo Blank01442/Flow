@@ -1,0 +1,40 @@
+# Performance test for Flow language
+
+let start_time = time()
+
+# Test mathematical computations
+let total = 0
+let i = 0
+while i < 10000 {
+    total = total + sqrt(i)
+    i = i + 1
+}
+
+let end_time = time()
+let elapsed = end_time - start_time
+
+print "Computed sqrt 10,000 times"
+print "Total:", total
+print "Time elapsed:", elapsed, "seconds"
+
+# Test list operations
+let test_list = []
+let j = 0
+while j < 1000 {
+    append(test_list, j)
+    j = j + 1
+}
+
+print "Created list with 1,000 elements"
+print "List length:", len(test_list)
+
+# Test function calls
+func fibonacci(n) {
+    if n < 2 {
+        return n
+    }
+    return fibonacci(n - 1) + fibonacci(n - 2)
+}
+
+let fib_result = fibonacci(10)
+print "Fibonacci(10):", fib_result

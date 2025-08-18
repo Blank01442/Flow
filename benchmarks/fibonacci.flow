@@ -1,0 +1,13 @@
+let n = 35
+let a = 0
+let b = 1
+let count = 0
+
+while count < n {
+    let next = a + b
+    a = b
+    b = next
+    count = count + 1
+}
+
+print "Fibonacci(35) = ", a

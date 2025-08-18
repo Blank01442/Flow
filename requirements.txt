@@ -1,0 +1,20 @@
+# Core dependencies for Flow language
+llvmlite>=0.40.0
+numpy>=1.21.0
+
+# Performance optimization dependencies
+psutil>=5.8.0  # System monitoring
+memory-profiler>=0.60.0  # Memory profiling
+line-profiler>=3.5.0  # Line-by-line profiling
+
+# Development and testing dependencies
+pytest>=6.2.5
+pytest-benchmark>=3.4.1
+pytest-cov>=2.12.1
+
+# Optional: JIT compilation optimizations
+numba>=0.56.0  # For additional JIT optimizations
+cython>=0.29.24  # For C extensions if needed
+
+# Optional: Performance monitoring
+py-spy>=0.3.0  # Sampling profiler

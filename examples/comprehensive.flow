@@ -1,0 +1,78 @@
+# Comprehensive Demo
+print "=== Flow Language Comprehensive Demo ==="
+
+# Variables and basic operations
+let name = "Flow"
+let version = 1.0
+let isAwesome = true
+print "Welcome to", name, "version", version
+
+# Lists
+let fruits = ["apple", "banana", "cherry"]
+print "Fruits:", fruits
+append(fruits, "date")
+print "Added a fruit:", fruits
+fruits[0] = "apricot"
+print "Modified first fruit:", fruits
+
+# Mathematical operations
+let radius = 5.0
+let area = 3.14159 * radius * radius
+let circumference = 2 * 3.14159 * radius
+print "Circle with radius", radius
+print "Area:", area
+print "Circumference:", circumference
+
+# Functions
+func factorial(n) {
+    if n <= 1 {
+        return 1
+    }
+    return n * factorial(n - 1)
+}
+
+let fact5 = factorial(5)
+print "Factorial of 5:", fact5
+
+# Control flow
+let scores = [85, 92, 78, 96, 88]
+let highest = max(scores)
+let lowest = min(scores)
+let average = sum(scores) / len(scores)
+
+print "Test scores:", scores
+print "Highest score:", highest
+print "Lowest score:", lowest
+print "Average score:", average
+
+# Conditional logic
+if average >= 90 {
+    print "Excellent class performance!"
+} else if average >= 80 {
+    print "Good class performance!"
+} else if average >= 70 {
+    print "Fair class performance."
+} else {
+    print "Needs improvement."
+}
+
+# String operations
+let sentence = "Flow,is,awesome,and,powerful"
+let words = split(sentence, ",")
+print "Words in sentence:", words
+let joined = join(" ", words)
+print "Joined sentence:", joined
+
+# Range and loops
+let evens = range(0, 11, 2)
+print "Even numbers 0-10:", evens
+
+let sumEvens = sum(evens)
+print "Sum of even numbers:", sumEvens
+
+# File operations (commented out to avoid file system changes)
+# write_file("demo.txt", "This is a demo file created by Flow")
+# let content = read_file("demo.txt")
+# print "File content:", content
+
+print "=== Demo Complete ==="
