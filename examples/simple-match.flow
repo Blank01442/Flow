@@ -1,6 +1,0 @@
-# Simple match test
-let value = 1
-match value {
-    case 1:
-        print "one"
-}

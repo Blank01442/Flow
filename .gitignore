@@ -141,3 +141,10 @@ Thumbs.db
 *.exe
 cache/
 *.pyc
+
+# Test files
+examples/*test*.flow
+examples/single-match.flow
+examples/simple-match.flow
+examples/simple-walrus*.flow
+examples/and-test.flow

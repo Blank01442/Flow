@@ -1,6 +1,0 @@
-# Simple walrus with and test
-let a = 10
-let b = 20
-if (sum := a + b) > 25 {
-    print "Sum is", sum
-}
