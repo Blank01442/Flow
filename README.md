@@ -32,7 +32,7 @@ python -m flow.flow_cli hello.flow
 
 - [Documentation Index](docs/README.md) - Main documentation index
 - [Getting Started](docs/getting-started.md) - Installation and basic usage
-- [Language Tutorial](docs/tutorial.md) - Complete beginner's guide
+- [Performance Comparison](docs/performance-comparison.md) - C, Python, and Flow comparison
 - [Quick Reference](docs/quick-reference.md) - Syntax cheat sheet
 - [Examples](examples/) - Sample programs
 
