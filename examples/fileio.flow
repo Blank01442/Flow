@@ -1,1 +1,21 @@
-# File I/O Example\nprint \"File I/O Demo\"\n\n# Write to a file\nlet content = \"Hello, Flow!\\nThis is a test file.\\nIt has multiple lines.\"\nwrite_file(\"test.txt\", content)\nprint \"Wrote content to test.txt\"\n\n# Read from a file\nlet readContent = read_file(\"test.txt\")\nprint \"Read from file:\"\nprint readContent\n\n# Process the content\nlet lines = split(readContent, \"\\n\")\nlet lineCount = len(lines)\nprint \"Number of lines:\", lineCount\n\n# Execute a system command\nprint \"Current directory contents:\"\nos_system(\"dir\")
+# File I/O Example
+print "File I/O Demo"
+
+# Write to a file
+let content = "Hello, Flow!\nThis is a test file.\nIt has multiple lines."
+write_file("test.txt", content)
+print "Wrote content to test.txt"
+
+# Read from a file
+let readContent = read_file("test.txt")
+print "Read from file:"
+print readContent
+
+# Process the content
+let lines = split(readContent, "\n")
+let lineCount = len(lines)
+print "Number of lines:", lineCount
+
+# Execute a system command
+print "Current directory contents:"
+os_system("dir")
