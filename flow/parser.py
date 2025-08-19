@@ -759,7 +759,7 @@ class Parser:
 
     def parse_factor(self):
         node = self.parse_power()
-        while self.current_token and self.current_token.type in (TokenType.MULTIPLY, TokenType.DIVIDE):
+        while self.current_token and self.current_token.type in (TokenType.MULTIPLY, TokenType.DIVIDE, TokenType.MODULO):
             op = self.current_token.type
             self.advance()
             right = self.parse_power()
