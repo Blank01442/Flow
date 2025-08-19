@@ -1,0 +1,19 @@
+# Comprehensive FFI example
+print "=== FFI Example ==="
+
+# Register and call a C standard library function
+# On Windows, we can use msvcrt.dll
+# On Unix systems, we can use libc.so.6
+
+# For demonstration, we'll show how to use FFI functions
+print "FFI functions available:"
+print "  ffi_load(lib_path) - Load a shared library"
+print "  ffi_register(lib_path, func_name, return_type, arg_types...) - Register function signature"
+print "  ffi_call(lib_path, func_name, args...) - Call a function"
+
+# Example of how to use FFI (commented out since we don't have a specific library to load)
+# ffi_register("msvcrt.dll", "abs", "int", ["int"])
+# let result = ffi_call("msvcrt.dll", "abs", -5)
+# print "Absolute value of -5:", result
+
+print "FFI system is ready for use!"

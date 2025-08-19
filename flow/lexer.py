@@ -25,6 +25,16 @@ class TokenType(Enum):
     MACRO = r'macro'
     CONST = r'const'
     EVAL = r'eval'
+    ASYNC = r'async'
+    AWAIT = r'await'
+    SPAWN = r'spawn'
+    CHANNEL = r'channel'
+    SEND = r'send'
+    RECEIVE = r'receive'
+    LAMBDA = r'lambda'
+    MAP = r'map'
+    FILTER = r'filter'
+    REDUCE = r'reduce'
 
     # Data types
     IDENTIFIER = r'[a-zA-Z_][a-zA-Z0-9_]*'
@@ -37,6 +47,7 @@ class TokenType(Enum):
     # Operators
     EQUALS = r'='
     WALRUS = r':='
+    PIPELINE = r'\|>'
     PLUS = r'\+'
     MINUS = r'-'
     MULTIPLY = r'\*'
@@ -119,6 +130,16 @@ class Lexer:
             (TokenType.MACRO, re.compile(r'macro')),
             (TokenType.CONST, re.compile(r'const')),
             (TokenType.EVAL, re.compile(r'eval')),
+            (TokenType.ASYNC, re.compile(r'async')),
+            (TokenType.AWAIT, re.compile(r'await')),
+            (TokenType.SPAWN, re.compile(r'spawn')),
+            (TokenType.CHANNEL, re.compile(r'channel')),
+            (TokenType.SEND, re.compile(r'send')),
+            (TokenType.RECEIVE, re.compile(r'receive')),
+            (TokenType.LAMBDA, re.compile(r'lambda')),
+            (TokenType.MAP, re.compile(r'map')),
+            (TokenType.FILTER, re.compile(r'filter')),
+            (TokenType.REDUCE, re.compile(r'reduce')),
             (TokenType.BOOLEAN, re.compile(r'true|false')),
             (TokenType.FLOAT, re.compile(r'\d+\.\d+')),
             (TokenType.INTEGER, re.compile(r'\d+')),
@@ -128,6 +149,7 @@ class Lexer:
             (TokenType.LESS_EQUAL, re.compile(r'<=')),
             (TokenType.GREATER_EQUAL, re.compile(r'>=')),
             (TokenType.EQUALS, re.compile(r'=')),
+            (TokenType.PIPELINE, re.compile(r'\|>')),
             (TokenType.PLUS, re.compile(r'\+')),
             (TokenType.MINUS, re.compile(r'-')),
             (TokenType.MULTIPLY, re.compile(r'\*')),

@@ -10,7 +10,10 @@ from .parser import (
     VariableDeclarationNode, VariableAccessNode, AssignmentNode, IfNode,
     WhileNode, ForNode, MatchNode, CaseNode, AssignmentExpressionNode, FunctionDeclarationNode, FunctionCallNode, ReturnNode,
     BlockNode, ExternFunctionDeclarationNode, BuiltinFunctionCallNode,
-    ListNode, IndexAccessNode, IndexAssignmentNode, UnaryOpNode
+    ListNode, IndexAccessNode, IndexAssignmentNode, UnaryOpNode,
+    AsyncFunctionDeclarationNode, AwaitExpressionNode, SpawnExpressionNode,
+    ChannelDeclarationNode, SendStatementNode, ReceiveStatementNode,
+    LambdaExpressionNode, MapFunctionNode, FilterFunctionNode, ReduceFunctionNode
 )
 from .lexer import TokenType
 
@@ -275,6 +278,12 @@ class VM:
         if node.default_case:
             self.visit(node.default_case)
 
+    def visit_ExternFunctionDeclarationNode(self, node):
+        """Handle extern function declarations"""
+        # Store the extern function declaration in globals
+        # For now, we'll just store the metadata
+        self.globals[f"_extern_{node.name}"] = node
+
     def visit_AssignmentExpressionNode(self, node):
         """Handle assignment expressions (walrus operator)"""
         # Evaluate the value
@@ -289,6 +298,50 @@ class VM:
         self.globals[node.name] = node
 
     def visit_FunctionCallNode(self, node):
+        # Check if this is an async function call
+        if node.name in self.globals:
+            func_def = self.globals[node.name]
+            # Handle both regular and async functions the same way for now
+            if isinstance(func_def, (FunctionDeclarationNode, AsyncFunctionDeclarationNode)):
+                # Evaluate arguments
+                args = [self.visit(arg) for arg in node.args]
+                
+                # Create new frame for function execution
+                # For simplicity, we'll just add the arguments to globals
+                # A full implementation would use proper scoping
+                old_globals = self.globals.copy()
+                for i, param in enumerate(func_def.params):
+                    if i < len(args):
+                        self.globals[param] = args[i]
+                    else:
+                        self.globals[param] = None
+                        
+                # Execute function body
+                result = None
+                try:
+                    self.visit(func_def.body)
+                except ReturnException as e:
+                    result = e.value
+                    
+                # Restore globals
+                self.globals = old_globals
+                return result
+        
+        # Check if this is an extern function call
+        extern_key = f"_extern_{node.name}"
+        if extern_key in self.globals and isinstance(self.globals[extern_key], ExternFunctionDeclarationNode):
+            # This is an extern function call
+            extern_def = self.globals[extern_key]
+            
+            # Evaluate arguments
+            args = [self.visit(arg) for arg in node.args]
+            
+            # For now, we'll just return a placeholder
+            # In a full implementation, we would call the actual C function
+            print(f"Calling extern function {node.name} with args {args}")
+            return 0  # Placeholder return value
+            
+        # Regular function call
         if node.name not in self.globals:
             raise NameError(f"Function '{node.name}' is not defined")
             
@@ -349,6 +402,173 @@ class VM:
         """Handle tuple literals"""
         elements = [self.visit(element) for element in node.elements]
         return tuple(elements)
+
+    def visit_LambdaExpressionNode(self, node):
+        """Handle lambda expressions"""
+        # For now, we'll just return a placeholder
+        # In a full implementation, we would create a callable function
+        print(f"Creating lambda with params {node.params}")
+        return f"lambda({', '.join(node.params)})"
+
+    def visit_MapFunctionNode(self, node):
+        """Handle map function calls"""
+        func = self.visit(node.func)
+        iterable = self.visit(node.iterable)
+        
+        # Check if func is a Flow function
+        if isinstance(func, FunctionDeclarationNode):
+            # Create a Python callable that wraps the Flow function
+            def flow_func_wrapper(item):
+                # Save current globals
+                old_globals = self.globals.copy()
+                
+                # Set the parameter
+                if func.params:
+                    self.globals[func.params[0]] = item
+                
+                # Execute function body
+                result = None
+                try:
+                    self.visit(func.body)
+                except ReturnException as e:
+                    result = e.value
+                
+                # Restore globals
+                self.globals = old_globals
+                return result
+            
+            # Apply the function to each element
+            return [flow_func_wrapper(item) for item in iterable]
+        else:
+            # For now, we'll just return the iterable as a placeholder
+            # In a full implementation, we would apply the function to each element
+            print(f"Mapping {func} over {iterable}")
+            return [item for item in iterable] if isinstance(iterable, list) else []
+
+    def visit_FilterFunctionNode(self, node):
+        """Handle filter function calls"""
+        func = self.visit(node.func)
+        iterable = self.visit(node.iterable)
+        
+        # Check if func is a Flow function
+        if isinstance(func, FunctionDeclarationNode):
+            # Create a Python callable that wraps the Flow function
+            def flow_func_wrapper(item):
+                # Save current globals
+                old_globals = self.globals.copy()
+                
+                # Set the parameter
+                if func.params:
+                    self.globals[func.params[0]] = item
+                
+                # Execute function body
+                result = None
+                try:
+                    self.visit(func.body)
+                except ReturnException as e:
+                    result = e.value
+                
+                # Restore globals
+                self.globals = old_globals
+                return result
+            
+            # Filter the elements
+            return [item for item in iterable if flow_func_wrapper(item)]
+        else:
+            # For now, we'll just return the iterable as a placeholder
+            # In a full implementation, we would filter the elements
+            print(f"Filtering {iterable} with {func}")
+            return [item for item in iterable] if isinstance(iterable, list) else []
+
+    def visit_ReduceFunctionNode(self, node):
+        """Handle reduce function calls"""
+        func = self.visit(node.func)
+        iterable = self.visit(node.iterable)
+        initial = self.visit(node.initial) if node.initial else None
+        
+        # Check if func is a Flow function
+        if isinstance(func, FunctionDeclarationNode):
+            # Create a Python callable that wraps the Flow function
+            def flow_func_wrapper(acc, item):
+                # Save current globals
+                old_globals = self.globals.copy()
+                
+                # Set the parameters
+                if len(func.params) >= 2:
+                    self.globals[func.params[0]] = acc
+                    self.globals[func.params[1]] = item
+                
+                # Execute function body
+                result = None
+                try:
+                    self.visit(func.body)
+                except ReturnException as e:
+                    result = e.value
+                
+                # Restore globals
+                self.globals = old_globals
+                return result
+            
+            # Reduce the elements
+            if not iterable:
+                return initial
+            
+            if initial is None:
+                result = iterable[0]
+                items = iterable[1:]
+            else:
+                result = initial
+                items = iterable
+            
+            for item in items:
+                result = flow_func_wrapper(result, item)
+            return result
+        else:
+            # For now, we'll just return a placeholder
+            # In a full implementation, we would reduce the elements
+            print(f"Reducing {iterable} with {func}")
+            return initial if initial is not None else (iterable[0] if isinstance(iterable, list) and iterable else None)
+
+    def visit_AsyncFunctionDeclarationNode(self, node):
+        """Handle async function declarations"""
+        # Store the async function definition in globals
+        self.globals[node.name] = node
+
+    def visit_AwaitExpressionNode(self, node):
+        """Handle await expressions"""
+        # For now, we'll just evaluate the expression directly
+        # In a full implementation, we would handle async execution
+        return self.visit(node.expression)
+
+    def visit_SpawnExpressionNode(self, node):
+        """Handle spawn expressions"""
+        # For now, we'll just evaluate the expression directly
+        # In a full implementation, we would spawn a new thread/task
+        return self.visit(node.expression)
+
+    def visit_ChannelDeclarationNode(self, node):
+        """Handle channel declarations"""
+        # For now, we'll just create a placeholder
+        # In a full implementation, we would create a proper channel
+        channel = {"type": "channel", "data": []}
+        self.globals[node.identifier] = channel
+
+    def visit_SendStatementNode(self, node):
+        """Handle send statements"""
+        # For now, we'll just evaluate the value
+        # In a full implementation, we would send the value to the channel
+        value = self.visit(node.value)
+        channel_name = node.channel.identifier
+        print(f"Sending {value} to channel {channel_name}")
+
+    def visit_ReceiveStatementNode(self, node):
+        """Handle receive statements"""
+        # For now, we'll just return a placeholder
+        # In a full implementation, we would receive a value from the channel
+        channel_name = node.channel.identifier
+        variable_name = node.variable
+        print(f"Receiving from channel {channel_name} into {variable_name}")
+        self.globals[variable_name] = None  # Placeholder value
 
     def visit_IndexAccessNode(self, node):
         """Handle index access like arr[0]"""

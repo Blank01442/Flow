@@ -1,0 +1,10 @@
+# Simple concurrency example
+print "=== Concurrency Example ==="
+
+# Async function example
+async func fetch_data(url) {
+    print "Fetching data from", url
+    return "Data from " + url
+}
+
+print "Concurrency features parsing correctly!"

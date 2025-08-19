@@ -37,6 +37,28 @@ class BooleanNode(ASTNode):
 
 
 # Generic/Template nodes
+class LambdaExpressionNode(ASTNode):
+    def __init__(self, params, body):
+        self.params = params
+        self.body = body
+
+class MapFunctionNode(ASTNode):
+    def __init__(self, func, iterable):
+        self.func = func
+        self.iterable = iterable
+
+class FilterFunctionNode(ASTNode):
+    def __init__(self, func, iterable):
+        self.func = func
+        self.iterable = iterable
+
+class ReduceFunctionNode(ASTNode):
+    def __init__(self, func, iterable, initial=None):
+        self.func = func
+        self.iterable = iterable
+        self.initial = initial
+
+# Generic/Template nodes
 class GenericTypeNode(ASTNode):
     def __init__(self, base_type, type_params):
         self.base_type = base_type
@@ -50,6 +72,35 @@ class GenericFunctionDeclarationNode(ASTNode):
         self.params = params
         self.body = body
 
+class AsyncFunctionDeclarationNode(ASTNode):
+    def __init__(self, name, params, body):
+        self.name = name
+        self.params = params
+        self.body = body
+
+class AwaitExpressionNode(ASTNode):
+    def __init__(self, expression):
+        self.expression = expression
+
+class SpawnExpressionNode(ASTNode):
+    def __init__(self, expression):
+        self.expression = expression
+
+class ChannelDeclarationNode(ASTNode):
+    def __init__(self, identifier, data_type=None):
+        self.identifier = identifier
+        self.data_type = data_type
+
+class SendStatementNode(ASTNode):
+    def __init__(self, channel, value):
+        self.channel = channel
+        self.value = value
+
+class ReceiveStatementNode(ASTNode):
+    def __init__(self, channel, variable):
+        self.channel = channel
+        self.variable = variable
+
 class BinOpNode(ASTNode):
     def __init__(self, left, op, right):
         self.left = left
@@ -57,6 +108,13 @@ class BinOpNode(ASTNode):
         self.right = right
         self.op = op
         self.right = right
+
+
+class PipelineNode(ASTNode):
+    def __init__(self, left, right):
+        self.left = left
+        self.right = right
+
 
 class VariableDeclarationNode(ASTNode):
     def __init__(self, identifier, value):
@@ -152,9 +210,11 @@ class BlockNode(ASTNode):
         self.statements = statements
 
 class ExternFunctionDeclarationNode(ASTNode):
-    def __init__(self, name, params):
+    def __init__(self, name, params, return_type=None, lib_path=None):
         self.name = name
         self.params = params
+        self.return_type = return_type
+        self.lib_path = lib_path
 
 class BuiltinFunctionCallNode(ASTNode):
     def __init__(self, name, args):
@@ -292,6 +352,8 @@ class Parser:
             return self.parse_mutable_declaration()
         elif self.current_token.type == TokenType.FUNC or self.current_token.type == TokenType.FN:
             return self.parse_function_declaration()
+        elif self.current_token.type == TokenType.ASYNC:
+            return self.parse_async_function_declaration()
         elif self.current_token.type == TokenType.IF:
             return self.parse_if_statement()
         elif self.current_token.type == TokenType.WHILE:
@@ -306,6 +368,12 @@ class Parser:
             return ReturnNode(value)
         elif self.current_token.type == TokenType.EXTERN:
             return self.parse_extern_function_declaration()
+        elif self.current_token.type == TokenType.CHANNEL:
+            return self.parse_channel_declaration()
+        elif self.current_token.type == TokenType.SEND:
+            return self.parse_send_statement()
+        elif self.current_token.type == TokenType.RECEIVE:
+            return self.parse_receive_statement()
         elif self.current_token.type == TokenType.ALLOC:
             return self.parse_alloc_statement()
         elif self.current_token.type == TokenType.FREE:
@@ -606,6 +674,30 @@ class Parser:
         return BlockNode(statements)
 
     def parse_expression(self):
+        # Check for lambda expression
+        if self.current_token and self.current_token.type == TokenType.LAMBDA:
+            return self.parse_lambda_expression()
+        
+        # Check for map function
+        if self.current_token and self.current_token.type == TokenType.MAP:
+            return self.parse_map_function()
+        
+        # Check for filter function
+        if self.current_token and self.current_token.type == TokenType.FILTER:
+            return self.parse_filter_function()
+        
+        # Check for reduce function
+        if self.current_token and self.current_token.type == TokenType.REDUCE:
+            return self.parse_reduce_function()
+        
+        # Check for spawn expression
+        if self.current_token and self.current_token.type == TokenType.SPAWN:
+            return self.parse_spawn_expression()
+        
+        # Check for await expression
+        if self.current_token and self.current_token.type == TokenType.AWAIT:
+            return self.parse_await_expression()
+        
         # Check for assignment expression (walrus operator)
         # Look ahead to see if we have an identifier followed by :=
         if (self.current_token and self.current_token.type == TokenType.IDENTIFIER and
@@ -618,7 +710,26 @@ class Parser:
             value = self.parse_expression()
             return AssignmentExpressionNode(identifier, value)
         
-        # Parse logical OR expressions (lowest precedence)
+        # Parse pipeline expressions (lowest precedence)
+        node = self.parse_logical_or()
+        while self.current_token and self.current_token.type == TokenType.PIPELINE:
+            self.advance()
+            right = self.parse_logical_or()
+            node = PipelineNode(node, right)
+        return node
+
+    def parse_logical_or(self):
+        # Parse logical OR expressions
+        node = self.parse_logical_and()
+        while self.current_token and self.current_token.type == TokenType.OR:
+            op = self.current_token.type
+            self.advance()
+            right = self.parse_logical_and()
+            node = BinOpNode(node, op, right)
+        return node
+
+    def parse_logical_or(self):
+        # Parse logical OR expressions
         node = self.parse_logical_and()
         while self.current_token and self.current_token.type == TokenType.OR:
             op = self.current_token.type
@@ -628,16 +739,6 @@ class Parser:
         return node
 
     def parse_logical_and(self):
-        # Parse logical AND expressions
-        node = self.parse_comparison()
-        while self.current_token and self.current_token.type == TokenType.AND:
-            op = self.current_token.type
-            self.advance()
-            right = self.parse_comparison()
-            node = BinOpNode(node, op, right)
-        return node
-
-    def parse_comparison(self):
         # Parse comparison expressions
         node = self.parse_term()
         while self.current_token and self.current_token.type in (TokenType.LESS_THAN, TokenType.GREATER_THAN, TokenType.EQUAL_EQUAL, TokenType.NOT_EQUALS, TokenType.LESS_EQUAL, TokenType.GREATER_EQUAL):
@@ -773,6 +874,13 @@ class Parser:
         self.advance() # Consume 'func'
         name = self.current_token.value
         self.advance() # Consume identifier
+        
+        # Check for library specification
+        lib_path = None
+        if self.current_token.type == TokenType.STRING:
+            lib_path = self.current_token.value
+            self.advance() # Consume string
+        
         self.advance() # Consume '('
         params = []
         if self.current_token.type != TokenType.RPAREN:
@@ -783,7 +891,171 @@ class Parser:
                 params.append(self.current_token.value)
                 self.advance()
         self.advance() # Consume ')'
-        return ExternFunctionDeclarationNode(name, params)
+        
+        # Check for return type specification
+        return_type = None
+        if self.current_token.type == TokenType.COLON:
+            self.advance() # Consume ':'
+            if self.current_token.type == TokenType.IDENTIFIER:
+                return_type = self.current_token.value
+                self.advance()
+        
+        return ExternFunctionDeclarationNode(name, params, return_type, lib_path)
+
+    def parse_lambda_expression(self):
+        """Parse lambda expressions"""
+        self.advance() # Consume 'lambda'
+        
+        # Parse parameters
+        params = []
+        if self.current_token and self.current_token.type == TokenType.LPAREN:
+            self.advance() # Consume '('
+            if self.current_token and self.current_token.type != TokenType.RPAREN:
+                params.append(self.current_token.value)
+                self.advance()
+                while self.current_token and self.current_token.type == TokenType.COMMA:
+                    self.advance()
+                    params.append(self.current_token.value)
+                    self.advance()
+            self.advance() # Consume ')'
+        
+        # Parse arrow (->)
+        if self.current_token and self.current_token.type == TokenType.MINUS:
+            self.advance() # Consume '-'
+            if self.current_token and self.current_token.type == TokenType.GREATER_THAN:
+                self.advance() # Consume '>'
+        
+        # Parse body
+        body = self.parse_expression()
+        return LambdaExpressionNode(params, body)
+
+    def parse_map_function(self):
+        """Parse map function calls"""
+        self.advance() # Consume 'map'
+        self.advance() # Consume '('
+        func = self.parse_expression()
+        self.advance() # Consume ','
+        iterable = self.parse_expression()
+        self.advance() # Consume ')'
+        return MapFunctionNode(func, iterable)
+
+    def parse_filter_function(self):
+        """Parse filter function calls"""
+        self.advance() # Consume 'filter'
+        self.advance() # Consume '('
+        func = self.parse_expression()
+        self.advance() # Consume ','
+        iterable = self.parse_expression()
+        self.advance() # Consume ')'
+        return FilterFunctionNode(func, iterable)
+
+    def parse_reduce_function(self):
+        """Parse reduce function calls"""
+        self.advance() # Consume 'reduce'
+        self.advance() # Consume '('
+        func = self.parse_expression()
+        self.advance() # Consume ','
+        iterable = self.parse_expression()
+        
+        # Check for initial value
+        initial = None
+        if self.current_token and self.current_token.type == TokenType.COMMA:
+            self.advance() # Consume ','
+            initial = self.parse_expression()
+            
+        self.advance() # Consume ')'
+        return ReduceFunctionNode(func, iterable, initial)
+
+    def parse_async_function_declaration(self):
+        """Parse async function declarations"""
+        self.advance() # Consume 'async'
+        self.advance() # Consume 'func'
+        name = self.current_token.value
+        self.advance() # Consume identifier
+        self.advance() # Consume '('
+        params = []
+        if self.current_token.type != TokenType.RPAREN:
+            params.append(self.current_token.value)
+            self.advance()
+            while self.current_token.type == TokenType.COMMA:
+                self.advance()
+                params.append(self.current_token.value)
+                self.advance()
+        self.advance() # Consume ')'
+        body = self.parse_block()
+        return AsyncFunctionDeclarationNode(name, params, body)
+
+    def parse_await_expression(self):
+        """Parse async function declarations"""
+        self.advance() # Consume 'async'
+        self.advance() # Consume 'func'
+        name = self.current_token.value
+        self.advance() # Consume identifier
+        self.advance() # Consume '('
+        params = []
+        if self.current_token.type != TokenType.RPAREN:
+            params.append(self.current_token.value)
+            self.advance()
+            while self.current_token.type == TokenType.COMMA:
+                self.advance()
+                params.append(self.current_token.value)
+                self.advance()
+        self.advance() # Consume ')'
+        body = self.parse_block()
+        return AsyncFunctionDeclarationNode(name, params, body)
+
+    def parse_await_expression(self):
+        """Parse await expressions"""
+        self.advance() # Consume 'await'
+        expression = self.parse_expression()
+        return AwaitExpressionNode(expression)
+
+    def parse_spawn_expression(self):
+        """Parse spawn expressions"""
+        self.advance() # Consume 'spawn'
+        expression = self.parse_expression()
+        return SpawnExpressionNode(expression)
+
+    def parse_channel_declaration(self):
+        """Parse channel declarations"""
+        self.advance() # Consume 'channel'
+        identifier = self.current_token.value
+        self.advance() # Consume identifier
+        
+        # Check for data type specification
+        data_type = None
+        if self.current_token and self.current_token.type == TokenType.COLON:
+            self.advance() # Consume ':'
+            if self.current_token and self.current_token.type == TokenType.IDENTIFIER:
+                data_type = self.current_token.value
+                self.advance()
+        
+        return ChannelDeclarationNode(identifier, data_type)
+
+    def parse_send_statement(self):
+        """Parse send statements"""
+        self.advance() # Consume 'send'
+        channel = self.parse_expression()
+        if self.current_token.type != TokenType.COMMA:
+            raise Exception("Expected ',' after channel in send statement")
+        self.advance() # Consume ','
+        value = self.parse_expression()
+        return SendStatementNode(channel, value)
+
+    def parse_receive_statement(self):
+        """Parse receive statements"""
+        self.advance() # Consume 'receive'
+        channel = self.parse_expression()
+        if self.current_token and self.current_token.type == TokenType.COMMA:
+            self.advance() # Consume ','
+            if self.current_token and self.current_token.type == TokenType.IDENTIFIER:
+                variable = self.current_token.value
+                self.advance() # Consume identifier
+                return ReceiveStatementNode(channel, variable)
+            else:
+                raise Exception("Expected identifier after ',' in receive statement")
+        else:
+            raise Exception("Expected ',' after channel in receive statement")
 
     def parse_builtin_function_call(self, name):
         self.advance() # Consume '('

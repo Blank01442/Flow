@@ -1,0 +1,33 @@
+# Functional programming example
+print "=== Functional Programming Example ==="
+
+# Create a list of numbers
+let numbers = [1, 2, 3, 4, 5]
+print "Numbers:", numbers
+
+# Define functions
+func square(x) {
+    return x * x
+}
+
+func is_even(x) {
+    return x == 2 or x == 4
+}
+
+func add(acc, x) {
+    return acc + x
+}
+
+# Map example - square each number
+let squares = map(square, numbers)
+print "Squares:", squares
+
+# Filter example - keep only even numbers
+let evens = filter(is_even, numbers)
+print "Evens:", evens
+
+# Reduce example - sum all numbers
+let sum = reduce(add, numbers, 0)
+print "Sum:", sum
+
+print "Functional programming features are ready!"

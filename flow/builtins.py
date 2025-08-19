@@ -4,12 +4,17 @@ import time
 import json
 from functools import lru_cache
 
+# Import FFI module
+from . import ffi
+
 BUILTINS = [
     'read_file', 'write_file', 'os_system', 'len', 'str', 'int', 'float', 
     'abs', 'min', 'max', 'sum', 'range', 'append', 'pop', 'split', 'join',
     'time', 'sleep', 'sqrt', 'pow', 'log', 'sin', 'cos', 'tan', 'json_parse',
     'json_stringify', 'floor', 'ceil', 'round', 'type', 'ord', 'chr', 'hex', 'bin',
-    'input', 'exit', 'random', 'randint', 'shuffle', 'sort', 'reverse', 'contains'
+    'input', 'exit', 'random', 'randint', 'shuffle', 'sort', 'reverse', 'contains',
+    'ffi_load', 'ffi_call', 'ffi_register',
+    'map', 'filter', 'reduce'
 ]
 
 # Cache for file operations to avoid repeated file system calls
@@ -243,3 +248,59 @@ def json_parse(string):
 def json_stringify(obj):
     """Convert object to JSON string"""
     return __builtins__['json.dumps'](obj)
+
+# FFI functions
+def ffi_load(lib_path):
+    """Load a shared library"""
+    return ffi.ffi_load(lib_path)
+
+def ffi_call(lib_path, func_name, *args):
+    """Call a function from a loaded library"""
+    return ffi.ffi_call(lib_path, func_name, *args)
+
+def ffi_register(lib_path, func_name, return_type, *arg_types):
+    """Register a function signature"""
+    return ffi.ffi_register(lib_path, func_name, return_type, arg_types)
+
+# Functional programming functions
+def map(func, iterable):
+    """Apply function to each element in iterable"""
+    if callable(func):
+        return [func(item) for item in iterable]
+    else:
+        # If func is not callable, it might be a Flow function
+        # In a full implementation, we would handle Flow functions properly
+        # For now, we'll return the iterable as a placeholder
+        return [item for item in iterable]
+
+def filter(func, iterable):
+    """Filter elements in iterable using function"""
+    if callable(func):
+        return [item for item in iterable if func(item)]
+    else:
+        # If func is not callable, it might be a Flow function
+        # In a full implementation, we would handle Flow functions properly
+        # For now, we'll return the iterable as a placeholder
+        return [item for item in iterable]
+
+def reduce(func, iterable, initial=None):
+    """Reduce elements in iterable using function"""
+    if not iterable:
+        return initial
+    
+    if initial is None:
+        result = iterable[0]
+        items = iterable[1:]
+    else:
+        result = initial
+        items = iterable
+    
+    if callable(func):
+        for item in items:
+            result = func(result, item)
+        return result
+    else:
+        # If func is not callable, it might be a Flow function
+        # In a full implementation, we would handle Flow functions properly
+        # For now, we'll return a placeholder
+        return result

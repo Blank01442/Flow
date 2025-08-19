@@ -14,10 +14,13 @@ Flow is a simple, fast, and easy-to-learn programming language that compiles to 
 8. [Error Handling](error-handling.md) - Dealing with errors
 9. [Performance Features](performance.md) - Profiling and optimization
 10. [Performance Comparison](performance-comparison.md) - C, Python, and Flow comparison
-11. [Examples](examples.md) - Sample programs
-12. [Best Practices](best-practices.md) - Coding guidelines and tips
-13. [Language Grammar](grammar.md) - Formal language specification
-14. [Contributing](contributing.md) - How to contribute to Flow
+11. [Foreign Function Interface (FFI)](ffi.md) - Calling C/C++ libraries
+12. [Concurrency and Parallelism](concurrency.md) - Async/await and channels
+13. [Functional Programming](functional.md) - Map, filter, reduce, and lambdas
+14. [Examples](examples.md) - Sample programs
+15. [Best Practices](best-practices.md) - Coding guidelines and tips
+16. [Language Grammar](grammar.md) - Formal language specification
+17. [Contributing](contributing.md) - How to contribute to Flow
 
 ## Quick Links
 
