@@ -10,6 +10,9 @@ Flow is a simple, fast, and easy-to-learn programming language that compiles to 
 - **Performance Tools**: Built-in profiler and JIT caching for optimization
 - **Cross-Platform**: Runs on Windows, macOS, and Linux
 - **Advanced Features**: Match statements, walrus operator, and more
+- **Foreign Function Interface (FFI)**: Call C/C++ libraries directly
+- **Concurrency Support**: Async/await, channels, and lightweight threads
+- **Functional Programming**: Map, filter, reduce, and lambda expressions
 
 ## Performance
 
@@ -28,13 +31,24 @@ Recent benchmark results:
 pip install -r requirements.txt
 ```
 
+### Easy Installation (Windows)
+Run the `install.bat` script to automatically set up the `flow` command:
+```bash
+install.bat
+```
+
 ### Hello World
 Create a file called `hello.flow`:
 ```flow
 print "Hello, World!"
 ```
 
-Run it:
+Run it using the simple command:
+```bash
+flow hello.flow
+```
+
+Or using the traditional method:
 ```bash
 python -m flow.flow_cli hello.flow
 ```
@@ -47,6 +61,7 @@ python -m flow.flow_cli hello.flow
 - [Quick Reference](docs/quick-reference.md) - Syntax cheat sheet
 - [Examples](examples/) - Sample programs
 - [Examples Documentation](docs/examples.md) - Detailed explanations of each example
+- [Running Programs](docs/running-programs.md) - How to run Flow programs
 
 ## Key Language Features
 
@@ -150,12 +165,70 @@ while (value := data[i]) < 4 {
 }
 ```
 
+### Foreign Function Interface (FFI)
+```flow
+# Load a system library
+let lib = ffi_load("msvcrt.dll")  # Windows example
+
+# Register a function signature
+ffi_register("msvcrt.dll", "abs", "int", ["int"])
+
+# Call a function
+let result = ffi_call("msvcrt.dll", "abs", -5)
+print "Absolute value of -5:", result
+```
+
+### Concurrency Features
+```flow
+# Async function example
+async func fetch_data(url) {
+    # Simulate async operation
+    print "Fetching data from", url
+    return "Data from " + url
+}
+
+# Await example
+let data = await fetch_data("https://api.example.com")
+print "Got data:", data
+```
+
+### Functional Programming
+```flow
+# Create a list of numbers
+let numbers = [1, 2, 3, 4, 5]
+
+# Define functions
+func square(x) {
+    return x * x
+}
+
+func is_even(x) {
+    return x == 2 or x == 4
+}
+
+func add(acc, x) {
+    return acc + x
+}
+
+# Map example - square each number
+let squares = map(square, numbers)
+print "Squares:", squares
+
+# Filter example - keep only even numbers
+let evens = filter(is_even, numbers)
+print "Evens:", evens
+
+# Reduce example - sum all numbers
+let sum = reduce(add, numbers, 0)
+print "Sum:", sum
+```
+
 ## Performance Features
 
 ### Profiling
 Analyze your program's performance:
 ```bash
-python -m flow.flow_cli program.flow --profile
+flow program.flow --profile
 ```
 
 ### JIT Caching
@@ -174,11 +247,27 @@ Check out the [examples directory](examples/) for sample programs:
 - [Walrus Operator](examples/walrus.flow)
 - [Enhanced Features](examples/enhanced.flow)
 - [Comprehensive Example](examples/comprehensive.flow)
+- [FFI Example](examples/ffi.flow)
+- [Concurrency Example](examples/concurrency.flow)
+- [Functional Programming Example](examples/functional.flow)
 
 You can also view the [examples documentation](docs/examples.md) for detailed explanations of each example.
 
 ## Running Programs
 
+### Simple Method (after installation)
+```bash
+# Run a Flow program
+flow program.flow
+
+# Run with profiling
+flow program.flow --profile
+
+# Start REPL
+flow
+```
+
+### Traditional Method
 ```bash
 # Run a Flow program
 python -m flow.flow_cli program.flow
